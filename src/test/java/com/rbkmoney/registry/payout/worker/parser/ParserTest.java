@@ -1,5 +1,6 @@
-package com.rbkmoney.registry.payout.worker;
+package com.rbkmoney.registry.payout.worker.parser;
 
+import com.rbkmoney.registry.payout.worker.RegistryPayoutWorkerApplication;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
 import com.rbkmoney.registry.payout.worker.parser.rsb.RsbParser;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ public class ParserTest {
 
     @Test
     void testRsbParser() throws FileNotFoundException {
-        File file = new File("src/test/resources/parser/test.xls");
+        File file = new File("src/test/resources/test.xls");
         InputStream inputStream = new FileInputStream(file);
         Transactions transactions = rsbParser.parse(inputStream);
         assertEquals(10, transactions.getInvoicePayments().size());
