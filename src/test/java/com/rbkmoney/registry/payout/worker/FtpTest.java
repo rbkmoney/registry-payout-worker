@@ -22,9 +22,6 @@ public class FtpTest {
     private FakeFtpServer fakeFtpServer;
     private FtpClient ftpClient;
 
-    @Autowired
-    RegistryPayoutWorkerService registryPayoutWorkerService;
-
     @BeforeEach
     public void setup() throws IOException {
         fakeFtpServer = new FakeFtpServer();
@@ -57,7 +54,6 @@ public class FtpTest {
             ftpClient.changeWorkingDirectory("rsb");
             Collection<String> collection = ftpClient.listFiles("");
             assertTrue(collection.contains("test.xls"));
-            registryPayoutWorkerService.readTransactionsFromRegistries();
         } catch (Exception ex) {
             log.error("Received exception", ex);
         }
