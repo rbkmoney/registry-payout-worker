@@ -34,3 +34,14 @@ spring:
 info:
   version: '@project.version@'
   stage: dev
+
+ftp:
+  host: 93.189.41.9
+  port: 21
+  username: u194844
+  password: CMISvJlPGOYl
+  parentPath: registry
+
+scheduling:
+  fixed:
+    rate: 900000
