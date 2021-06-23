@@ -24,8 +24,6 @@ public class FtpTransactionsReader {
 
     public Transactions readDirectories(FTPClient ftpClient) throws IOException {
         Transactions transactions = new Transactions();
-        transactions.setInvoicePayments(new LinkedMultiValueMap<>());
-        transactions.setInvoiceRefunds(new LinkedMultiValueMap<>());
         FTPFile[] ftpDirs = ftpClient.listDirectories();
         for (FTPFile ftpDir : ftpDirs) {
             if (ftpDir.getName().equals(".") || ftpDir.getName().equals("..")) {
@@ -40,8 +38,6 @@ public class FtpTransactionsReader {
 
     private Transactions readFiles(FTPClient ftpClient, String pathDir) throws IOException {
         Transactions transactions = new Transactions();
-        transactions.setInvoicePayments(new LinkedMultiValueMap<>());
-        transactions.setInvoiceRefunds(new LinkedMultiValueMap<>());
         FTPFile[] ftpFiles = ftpClient.listFiles();
         for (FTPFile ftpFile : ftpFiles) {
             if (ftpFile.isFile()) {
