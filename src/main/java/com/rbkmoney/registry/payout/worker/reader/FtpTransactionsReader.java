@@ -54,11 +54,11 @@ public class FtpTransactionsReader {
                         .findFirst()
                         .orElseThrow(RegistryPayoutWorkerException::new)
                         .parse(inputStream);
+                transactions.addAll(fileTransactions);
                 inputStream.close();
                 ftpClient.makeDirectory(PATH_TO_PROCESSED_FILE);
                 ftpClient.rename(ftpClient.printWorkingDirectory() + "/" + ftpFile.getName(),
                         ftpClient.printWorkingDirectory() + "/" + PATH_TO_PROCESSED_FILE + "/" + ftpFile.getName());
-                transactions.addAll(fileTransactions);
             }
         }
         return transactions;
