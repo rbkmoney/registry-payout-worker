@@ -8,5 +8,5 @@ public interface RegistryParser {
 
     boolean isParse(String provider);
 
-    Transactions parse(InputStream var1);
+    Transactions parse(InputStream inputStream);
 }

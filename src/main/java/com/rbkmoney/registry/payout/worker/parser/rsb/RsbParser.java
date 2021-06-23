@@ -20,6 +20,8 @@ import static com.rbkmoney.registry.payout.worker.constant.PathToReadConstant.RS
 @Component
 public class RsbParser implements RegistryParser {
 
+    private static final String NUMERIC_PATTERN = "-?\\d+(,\\d+)?";
+
     @Override
     public boolean isParse(String provider) {
         return RSB.equals(provider);
@@ -58,7 +60,7 @@ public class RsbParser implements RegistryParser {
     }
 
     private boolean isNumeric(String strNum) {
-        Pattern pattern = Pattern.compile("-?\\d+(,\\d+)?");
+        Pattern pattern = Pattern.compile(NUMERIC_PATTERN);
         if (strNum == null) {
             return false;
         }
