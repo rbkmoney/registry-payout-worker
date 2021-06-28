@@ -21,7 +21,7 @@ public class HgClientService {
             UserType.internal_user(new InternalUser()));
     public static final EventRange EVENT_RANGE = new EventRange().setLimit(1);
 
-    public Payouts get(Transactions transactions) throws TException {
+    public Payouts getPayouts(Transactions transactions) throws TException {
         Payouts payouts = new Payouts();
         Map<String, Map<String, Float>> invoicePayment =
                 mapPartyShop(transactions.getInvoicePayments(), payouts);

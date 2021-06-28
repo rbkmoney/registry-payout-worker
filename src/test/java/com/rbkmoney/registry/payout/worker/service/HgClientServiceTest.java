@@ -20,7 +20,7 @@ public class HgClientServiceTest extends MockTransactions {
 
     @Test
     void testHgClientService() throws TException, IOException {
-        Payouts payouts = hgClientService.get(createTransactions());
+        Payouts payouts = hgClientService.getPayouts(createTransactions());
         assertEquals(8, payouts.getPayouts().size());
         assertEquals(-25, payouts.getPayouts().get("testPartyId12").get("testShopId12"));
         assertEquals(2, payouts.getPayouts().get("testPartyId1").size());

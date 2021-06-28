@@ -31,7 +31,7 @@ public class RegistryPayoutWorkerService {
             Transactions transactions = ftpTransactionsReader.readDirectories(ftpClient);
             log.info("Read {} payments and {} refunds",
                     transactions.getInvoicePayments().size(), transactions.getInvoiceRefunds().size());
-            Payouts payouts = hgClientService.get(transactions);
+            Payouts payouts = hgClientService.getPayouts(transactions);
         } catch (Exception ex) {
             log.error("Received error while connect to Ftp client:", ex);
         } finally {
