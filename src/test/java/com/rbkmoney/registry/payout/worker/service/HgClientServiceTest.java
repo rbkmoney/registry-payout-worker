@@ -25,6 +25,7 @@ public class HgClientServiceTest extends MockTransactions {
         assertEquals(-25, payouts.getPayouts().get("testPartyId12").get("testShopId12"));
         assertEquals(2, payouts.getPayouts().get("testPartyId1").size());
         assertEquals(4, payouts.getPayouts().get("testPartyId1").get("testShopId2"));
+        assertEquals(2, payouts.getPayouts().get("testPartyId1").get("testShopId1"));
         assertEquals(4, payouts.getPayouts().get("testPartyId1").get("testShopId2"));
         assertEquals(2, payouts.getPayouts().get("testPartyId2").size());
         assertEquals(8, payouts.getPayouts().get("testPartyId2").get("testShopId2"));

@@ -49,7 +49,7 @@ public class HgClientService {
     private MultiValueMap<String, Float> setNegativeNumber(MultiValueMap<String, Float> invoiceRefund) {
         for (String key : invoiceRefund.keySet()) {
             List<Float> list =
-                    invoiceRefund.get(key).stream().map(v -> -v).collect(Collectors.toList());
+                    invoiceRefund.get(key).stream().map(v -> v > 0 ? -v : v).collect(Collectors.toList());
             invoiceRefund.put(key, list);
         }
         return invoiceRefund;
