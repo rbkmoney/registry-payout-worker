@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
 
 import java.io.IOException;
 import java.io.InputStream;

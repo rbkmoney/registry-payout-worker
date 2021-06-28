@@ -1,6 +1,7 @@
 package com.rbkmoney.registry.payout.worker.service;
 
 import com.rbkmoney.registry.payout.worker.config.FtpConfiguration;
+import com.rbkmoney.registry.payout.worker.model.Payouts;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
 import com.rbkmoney.registry.payout.worker.reader.FtpTransactionsReader;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +20,18 @@ public class RegistryPayoutWorkerService {
 
     private final FtpConfiguration ftpConfiguration;
     private final FtpTransactionsReader ftpTransactionsReader;
+    private final HgClientService hgClientService;
 
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
     public void readTransactionsFromRegistries() {
-        Transactions transactions;
         FTPClient ftpClient = new FTPClient();
         try {
             ftpClient = ftpClient();
             ftpClient.changeWorkingDirectory(ftpConfiguration.getParentPath());
-            transactions = ftpTransactionsReader.readDirectories(ftpClient);
+            Transactions transactions = ftpTransactionsReader.readDirectories(ftpClient);
             log.info("Read {} payments and {} refunds",
                     transactions.getInvoicePayments().size(), transactions.getInvoiceRefunds().size());
+            Payouts payouts = hgClientService.get(transactions);
         } catch (Exception ex) {
             log.error("Received error while connect to Ftp client:", ex);
         } finally {
