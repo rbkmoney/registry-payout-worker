@@ -24,20 +24,25 @@ public class MockTransactions {
     public Transactions createTransactions() throws TException, IOException {
         MultiValueMap<String, Float> payments = new LinkedMultiValueMap<>();
         MultiValueMap<String, Float> refunds = new LinkedMultiValueMap<>();
-        for (int i = 1; i < 12; i++) {
+        for (int i = 0; i < 5; i++) {
             payments.put(String.valueOf(i), Arrays.asList((float) i, (float) i + 1));
-            refunds.put(String.valueOf(i), Arrays.asList((float) i - 1, (float) i - 2));
+            refunds.put(String.valueOf(i - 1), Arrays.asList((float) i - 1, (float) i - 2));
         }
         Transactions transactions = new Transactions();
-        refunds.put("12", Arrays.asList((float) 11, (float) 14));
         transactions.setInvoicePayments(payments);
         transactions.setInvoiceRefunds(refunds);
-        mockPayment(transactions);
+        mockPayment(transactions.getInvoicePayments(), transactions.getInvoiceRefunds());
         return transactions;
     }
 
-    private void mockPayment(Transactions transactions) throws TException, IOException {
-        for (String key : transactions.getInvoicePayments().keySet()) {
+    private void mockPayment(MultiValueMap<String, Float> invoicePaym,
+                             MultiValueMap<String, Float> invoiceRef) throws TException, IOException {
+        mockPayment(invoicePaym);
+        mockPayment(invoiceRef);
+    }
+
+    private void mockPayment(MultiValueMap<String, Float> map) throws TException, IOException {
+        for (String key : map.keySet()) {
             if (Integer.parseInt(key) < 3) {
                 when(invoicingClient.get(HgClientService.USER_INFO, key,
                         HgClientService.EVENT_RANGE))
@@ -45,28 +50,15 @@ public class MockTransactions {
                                 "testPartyId" + Integer.parseInt(key),
                                 "testShopId" + Integer.parseInt(key),
                                 key)));
-            } else if (Integer.parseInt(key) < 7) {
+            } else {
                 when(invoicingClient.get(HgClientService.USER_INFO, key,
                         HgClientService.EVENT_RANGE))
                         .thenReturn(new Invoice().setInvoice(buildInvoice(
                                 "testPartyId" + (Integer.parseInt(key) - 3),
                                 "testShopId" + (Integer.parseInt(key) - 2),
                                 key)));
-            } else {
-                when(invoicingClient.get(HgClientService.USER_INFO, key,
-                        HgClientService.EVENT_RANGE))
-                        .thenReturn(new Invoice().setInvoice(buildInvoice(
-                                "testPartyId" + (Integer.parseInt(key) - 5),
-                                "testShopId" + (Integer.parseInt(key) - 5),
-                                key)));
             }
         }
-        when(invoicingClient.get(HgClientService.USER_INFO, "12",
-                HgClientService.EVENT_RANGE))
-                .thenReturn(new Invoice().setInvoice(buildInvoice(
-                        "testPartyId12",
-                        "testShopId12",
-                        "12")));
 
     }
 
