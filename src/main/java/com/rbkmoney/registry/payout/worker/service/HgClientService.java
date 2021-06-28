@@ -38,7 +38,6 @@ public class HgClientService {
             Invoice invoice = invoicing.get(USER_INFO, key, EVENT_RANGE);
             String party = invoice.getInvoice().getOwnerId();
             String shop = invoice.getInvoice().getShopId();
-            System.out.println(key + ": " + map.get(key) + ": " + party + ": " + shop);
             Map<String, Float> shopMap = partyMap.get(party) != null ? partyMap.get(party) : new HashMap<>();
             float sum = (float) map.get(key).stream().mapToDouble(a -> a).sum();
             shopMap.merge(shop, sum, Float::sum);
