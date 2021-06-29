@@ -3,7 +3,6 @@ package com.rbkmoney.registry.payout.worker.parser;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EmptyFileException;
-import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Component;
@@ -38,7 +37,7 @@ public class RsbParser implements RegistryParser {
             MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
             MultiValueMap<String, Long> refunds = new LinkedMultiValueMap<>();
             while (rowIter.hasNext()) {
-                HSSFRow row = (HSSFRow) rowIter.next();
+                Row row = rowIter.next();
                 String merchTrxId = row.getCell(10).getStringCellValue();
                 String paymentAmount = row.getCell(4).getStringCellValue();
                 if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
