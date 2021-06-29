@@ -30,8 +30,7 @@ public class RsbParser implements RegistryParser {
     @Override
     public Transactions parse(InputStream inputStream) {
         Transactions transactions = new Transactions();
-        try {
-            Workbook workbook = WorkbookFactory.create(inputStream);
+        try (Workbook workbook = WorkbookFactory.create(inputStream)){
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIter = sheet.rowIterator();
             MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
