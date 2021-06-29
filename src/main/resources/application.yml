@@ -36,10 +36,10 @@ info:
   stage: dev
 
 ftp:
-  host: localhost
+  host: 93.189.41.9
   port: 21
-  username: test
-  password: test
+  username: u194844
+  password: CMISvJlPGOYl
   parentPath: registry
 
 scheduling:

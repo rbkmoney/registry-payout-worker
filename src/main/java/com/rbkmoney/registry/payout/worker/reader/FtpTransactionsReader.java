@@ -21,21 +21,7 @@ public class FtpTransactionsReader {
     private final List<RegistryParser> parsers;
     private static final String PATH_TO_PROCESSED_FILE = "processed";
 
-    public Transactions readDirectories(FTPClient ftpClient) throws IOException {
-        Transactions transactions = new Transactions();
-        FTPFile[] ftpDirs = ftpClient.listDirectories();
-        for (FTPFile ftpDir : ftpDirs) {
-            if (ftpDir.getName().equals(".") || ftpDir.getName().equals("..")) {
-                continue;
-            }
-            ftpClient.changeWorkingDirectory(ftpDir.getName());
-            transactions.addAll(readFiles(ftpClient, ftpDir.getName()));
-            ftpClient.changeToParentDirectory();
-        }
-        return transactions;
-    }
-
-    private Transactions readFiles(FTPClient ftpClient, String pathDir) throws IOException {
+    public Transactions readFiles(FTPClient ftpClient, String pathDir) throws IOException {
         Transactions transactions = new Transactions();
         FTPFile[] ftpFiles = ftpClient.listFiles();
         for (FTPFile ftpFile : ftpFiles) {

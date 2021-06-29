@@ -5,6 +5,7 @@ import com.rbkmoney.damsel.domain.CurrencyRef;
 import com.rbkmoney.damsel.payment_processing.PartyManagementSrv;
 import com.rbkmoney.payout.manager.*;
 import com.rbkmoney.registry.payout.worker.model.Payouts;
+import com.rbkmoney.registry.payout.worker.service.hg.rsb.InvoicingHgClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
@@ -23,14 +24,14 @@ public class PayoutManagerService {
     public void sendPayouts(Payouts payouts) {
         for (String party : payouts.getPayouts().keySet()) {
             PayoutParams payoutParams = new PayoutParams();
-            Map<String, Float> shops = payouts.getPayouts().get(party);
+            Map<String, Long> shops = payouts.getPayouts().get(party);
             for (String shop : shops.keySet()) {
                 if (shops.get(shop) > 0) {
                     try {
                         Cash cash = new Cash();
-                        cash.setAmount((long) (shops.get(shop) * 100));
+                        cash.setAmount(shops.get(shop));
                         CurrencyRef currencyRef = partyManagementClient
-                                .getShopAccount(HgClientService.USER_INFO, party, shop)
+                                .getShopAccount(InvoicingHgClientService.USER_INFO, party, shop)
                                 .getCurrency();
                         cash.setCurrency(currencyRef);
                         ShopParams shopParams = new ShopParams();

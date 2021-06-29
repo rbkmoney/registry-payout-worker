@@ -26,8 +26,8 @@ public class ParserTest {
         Transactions transactions = rsbParser.parse(inputStream);
         assertEquals(10, transactions.getInvoicePayments().size());
         assertEquals(1, transactions.getInvoiceRefunds().size());
-        assertEquals(970, transactions.getInvoicePayments().get("1Tgz70wxfxA").get(0));
-        assertEquals(242.5, transactions.getInvoiceRefunds().get("1ThpZ6eiyh6").get(0), 0);
+        assertEquals(97000, transactions.getInvoicePayments().get("1Tgz70wxfxA").get(0));
+        assertEquals(24250, transactions.getInvoiceRefunds().get("1ThpZ6eiyh6").get(0), 0);
     }
 
 }

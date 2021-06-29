@@ -2,6 +2,7 @@ package com.rbkmoney.registry.payout.worker.service;
 
 import com.rbkmoney.registry.payout.worker.RegistryPayoutWorkerApplication;
 import com.rbkmoney.registry.payout.worker.model.Payouts;
+import com.rbkmoney.registry.payout.worker.service.hg.rsb.InvoicingHgClientService;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class HgClientServiceTest extends MockTransactions {
 
     @Autowired
-    private HgClientService hgClientService;
+    private InvoicingHgClientService hgClientService;
 
     @Test
     void testHgClientService() throws TException, IOException {

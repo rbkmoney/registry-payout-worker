@@ -7,6 +7,7 @@ import com.rbkmoney.registry.payout.worker.parser.RegistryParser;
 import com.rbkmoney.registry.payout.worker.parser.rsb.RsbParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.ftpserver.FtpServer;
 import org.junit.jupiter.api.Test;
 
@@ -33,12 +34,19 @@ public class FileReaderTest {
             ftpServer.start();
             ftpClient = setFtpClient();
             storeFileOnFtp(ftpClient);
-            Transactions transactions = filereader().readDirectories(ftpClient);
-            assertEquals(10, transactions.getInvoicePayments().size());
-            assertEquals(1, transactions.getInvoiceRefunds().size());
-            assertEquals(970, transactions.getInvoicePayments().get("1Tgz70wxfxA").get(0));
-            assertEquals(242.5, transactions.getInvoiceRefunds().get("1ThpZ6eiyh6").get(0), 0);
-
+            FTPFile[] ftpDirs = ftpClient.listDirectories();
+            for (FTPFile ftpDir : ftpDirs) {
+                if (ftpDir.getName().equals(".") || ftpDir.getName().equals("..")) {
+                    continue;
+                }
+                ftpClient.changeWorkingDirectory(ftpDir.getName());
+                Transactions transactions = filereader().readFiles(ftpClient, "rsb");
+                assertEquals(10, transactions.getInvoicePayments().size());
+                assertEquals(1, transactions.getInvoiceRefunds().size());
+                assertEquals(97000, transactions.getInvoicePayments().get("1Tgz70wxfxA").get(0));
+                assertEquals(24250, transactions.getInvoiceRefunds().get("1ThpZ6eiyh6").get(0), 0);
+                ftpClient.changeToParentDirectory();
+            }
             deleteFileFromFtp(ftpClient);
         } catch (Exception ex) {
             log.error("Received exception", ex);

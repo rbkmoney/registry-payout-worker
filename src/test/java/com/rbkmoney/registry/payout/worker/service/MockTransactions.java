@@ -6,6 +6,7 @@ import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
+import com.rbkmoney.registry.payout.worker.service.hg.rsb.InvoicingHgClientService;
 import org.apache.thrift.TException;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,11 +23,11 @@ public class MockTransactions {
     private InvoicingSrv.Iface invoicingClient;
 
     public Transactions createTransactions() throws TException, IOException {
-        MultiValueMap<String, Float> payments = new LinkedMultiValueMap<>();
-        MultiValueMap<String, Float> refunds = new LinkedMultiValueMap<>();
+        MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
+        MultiValueMap<String, Long> refunds = new LinkedMultiValueMap<>();
         for (int i = 0; i < 5; i++) {
-            payments.put(String.valueOf(i), Arrays.asList((float) i, (float) i + 1));
-            refunds.put(String.valueOf(i - 1), Arrays.asList((float) i - 1, (float) i - 2));
+            payments.put(String.valueOf(i), Arrays.asList((long) i, (long) i + 1));
+            refunds.put(String.valueOf(i - 1), Arrays.asList((long) i - 1, (long) i - 2));
         }
         Transactions transactions = new Transactions();
         transactions.setInvoicePayments(payments);
@@ -35,24 +36,24 @@ public class MockTransactions {
         return transactions;
     }
 
-    private void mockPayment(MultiValueMap<String, Float> invoicePaym,
-                             MultiValueMap<String, Float> invoiceRef) throws TException, IOException {
+    private void mockPayment(MultiValueMap<String, Long> invoicePaym,
+                             MultiValueMap<String, Long> invoiceRef) throws TException, IOException {
         mockPayment(invoicePaym);
         mockPayment(invoiceRef);
     }
 
-    private void mockPayment(MultiValueMap<String, Float> map) throws TException, IOException {
+    private void mockPayment(MultiValueMap<String, Long> map) throws TException, IOException {
         for (String key : map.keySet()) {
             if (Integer.parseInt(key) < 3) {
-                when(invoicingClient.get(HgClientService.USER_INFO, key,
-                        HgClientService.EVENT_RANGE))
+                when(invoicingClient.get(InvoicingHgClientService.USER_INFO, key,
+                        InvoicingHgClientService.EVENT_RANGE))
                         .thenReturn(new Invoice().setInvoice(buildInvoice(
                                 "testPartyId" + Integer.parseInt(key),
                                 "testShopId" + Integer.parseInt(key),
                                 key)));
             } else {
-                when(invoicingClient.get(HgClientService.USER_INFO, key,
-                        HgClientService.EVENT_RANGE))
+                when(invoicingClient.get(InvoicingHgClientService.USER_INFO, key,
+                        InvoicingHgClientService.EVENT_RANGE))
                         .thenReturn(new Invoice().setInvoice(buildInvoice(
                                 "testPartyId" + (Integer.parseInt(key) - 3),
                                 "testShopId" + (Integer.parseInt(key) - 2),

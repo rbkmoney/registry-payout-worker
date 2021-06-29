@@ -37,14 +37,14 @@ public class RsbParser implements RegistryParser {
         }
         Sheet sheet = workbook.getSheetAt(0);
         Iterator<Row> rowIter = sheet.rowIterator();
-        MultiValueMap<String, Float> payments = new LinkedMultiValueMap<>();
-        MultiValueMap<String, Float> refunds = new LinkedMultiValueMap<>();
+        MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
+        MultiValueMap<String, Long> refunds = new LinkedMultiValueMap<>();
         while (rowIter.hasNext()) {
             HSSFRow row = (HSSFRow) rowIter.next();
             String merchTrxId = row.getCell(10).getStringCellValue();
             String paymentAmount = row.getCell(4).getStringCellValue();
             if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
-                float amount = Float.parseFloat(paymentAmount.replace(",", "."));
+                long amount = Long.parseLong(paymentAmount.replace(",", ""));
                 String invoice = merchTrxId.substring(0, merchTrxId.indexOf("."));
                 if (amount > 0) {
                     payments.add(invoice, amount);
