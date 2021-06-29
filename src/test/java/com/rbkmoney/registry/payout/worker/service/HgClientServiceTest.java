@@ -27,12 +27,12 @@ public class HgClientServiceTest extends MockTransactions {
         assertEquals(2, payouts.getPayouts().get("testPartyId0").size());
         assertEquals(2, payouts.getPayouts().get("testPartyId1").size());
         assertEquals(1, payouts.getPayouts().get("testPartyId2").size());
-        assertEquals(-3, payouts.getPayouts().get("testPartyId-1").get("testShopId-1"));
-        assertEquals(0, payouts.getPayouts().get("testPartyId0").get("testShopId0"));
-        assertEquals(2, payouts.getPayouts().get("testPartyId0").get("testShopId1"));
-        assertEquals(2, payouts.getPayouts().get("testPartyId1").get("testShopId1"));
-        assertEquals(9, payouts.getPayouts().get("testPartyId1").get("testShopId2"));
-        assertEquals(2, payouts.getPayouts().get("testPartyId2").get("testShopId2"));
+        assertEquals(-5, payouts.getPayouts().get("testPartyId-1").get("testShopId-1"));
+        assertEquals(11, payouts.getPayouts().get("testPartyId0").get("testShopId0"));
+        assertEquals(17, payouts.getPayouts().get("testPartyId0").get("testShopId1"));
+        assertEquals(15, payouts.getPayouts().get("testPartyId1").get("testShopId1"));
+        assertEquals(22, payouts.getPayouts().get("testPartyId1").get("testShopId2"));
+        assertEquals(17, payouts.getPayouts().get("testPartyId2").get("testShopId2"));
         assertNull(payouts.getPayouts().get("testPartyId0").get("testShopId2"));
     }
 

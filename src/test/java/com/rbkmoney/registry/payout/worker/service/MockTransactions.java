@@ -31,8 +31,8 @@ public class MockTransactions {
         MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
         MultiValueMap<String, Long> refunds = new LinkedMultiValueMap<>();
         for (int i = 0; i < 5; i++) {
-            payments.put(String.valueOf(i), Arrays.asList((long) i, (long) i + 1));
-            refunds.put(String.valueOf(i - 1), Arrays.asList((long) i - 1, (long) i - 2));
+            payments.put(String.valueOf(i), Arrays.asList((long) i + 5, (long) i + 9));
+            refunds.put(String.valueOf(i - 1), Arrays.asList((long) i - 2, (long) i - 3));
         }
         Transactions transactions = new Transactions();
         transactions.setInvoicePayments(payments);
