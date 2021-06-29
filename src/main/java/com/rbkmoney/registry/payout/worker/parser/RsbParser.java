@@ -1,7 +1,8 @@
 package com.rbkmoney.registry.payout.worker.parser;
 
-import com.rbkmoney.registry.payout.worker.exception.RegistryPayoutWorkerException;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.EmptyFileException;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
@@ -16,6 +17,7 @@ import java.util.regex.Pattern;
 
 import static com.rbkmoney.registry.payout.worker.constant.PathToReadConstant.RSB;
 
+@Slf4j
 @Component
 public class RsbParser implements RegistryParser {
 
@@ -28,33 +30,32 @@ public class RsbParser implements RegistryParser {
 
     @Override
     public Transactions parse(InputStream inputStream) {
-        Workbook workbook;
+        Transactions transactions = new Transactions();
         try {
-            workbook = WorkbookFactory.create(inputStream);
-        } catch (IOException | InvalidFormatException ex) {
-            throw new RegistryPayoutWorkerException("Failed create Workbook: ", ex);
-        }
-        Sheet sheet = workbook.getSheetAt(0);
-        Iterator<Row> rowIter = sheet.rowIterator();
-        MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
-        MultiValueMap<String, Long> refunds = new LinkedMultiValueMap<>();
-        while (rowIter.hasNext()) {
-            HSSFRow row = (HSSFRow) rowIter.next();
-            String merchTrxId = row.getCell(10).getStringCellValue();
-            String paymentAmount = row.getCell(4).getStringCellValue();
-            if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
-                long amount = Long.parseLong(paymentAmount.replace(",", ""));
-                String invoice = merchTrxId.substring(0, merchTrxId.indexOf("."));
-                if (amount > 0) {
-                    payments.add(invoice, amount);
-                } else {
-                    refunds.add(invoice, Math.abs(amount));
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIter = sheet.rowIterator();
+            MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
+            MultiValueMap<String, Long> refunds = new LinkedMultiValueMap<>();
+            while (rowIter.hasNext()) {
+                HSSFRow row = (HSSFRow) rowIter.next();
+                String merchTrxId = row.getCell(10).getStringCellValue();
+                String paymentAmount = row.getCell(4).getStringCellValue();
+                if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
+                    long amount = Long.parseLong(paymentAmount.replace(",", ""));
+                    String invoice = merchTrxId.substring(0, merchTrxId.indexOf("."));
+                    if (amount > 0) {
+                        payments.add(invoice, amount);
+                    } else {
+                        refunds.add(invoice, Math.abs(amount));
+                    }
                 }
             }
+            transactions.setInvoicePayments(payments);
+            transactions.setInvoiceRefunds(refunds);
+        } catch (EmptyFileException | InvalidFormatException | IOException ex) {
+            log.error("Failed parse registry.", ex);
         }
-        Transactions transactions = new Transactions();
-        transactions.setInvoicePayments(payments);
-        transactions.setInvoiceRefunds(refunds);
         return transactions;
     }
 
