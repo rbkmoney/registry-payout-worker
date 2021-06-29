@@ -21,6 +21,7 @@ public class RegistryPayoutWorkerService {
     private final FtpConfiguration ftpConfiguration;
     private final FtpTransactionsReader ftpTransactionsReader;
     private final HgClientService hgClientService;
+    private final PayoutManagerService payoutManagerService;
 
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
     public void readTransactionsFromRegistries() {
@@ -32,6 +33,7 @@ public class RegistryPayoutWorkerService {
             log.info("Read {} payments and {} refunds",
                     transactions.getInvoicePayments().size(), transactions.getInvoiceRefunds().size());
             Payouts payouts = hgClientService.getPayouts(transactions);
+            payoutManagerService.sendPayouts(payouts);
         } catch (Exception ex) {
             log.error("Received error while connect to Ftp client:", ex);
         } finally {
