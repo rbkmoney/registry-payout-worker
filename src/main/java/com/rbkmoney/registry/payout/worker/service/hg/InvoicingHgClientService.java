@@ -33,11 +33,11 @@ public class InvoicingHgClientService implements HgClientService {
     @Override
     public Payouts getPayouts(Transactions transactions) {
         Payouts payouts = new Payouts();
-        Map<String, Map<String, Long>> invoicePayment =
+        Map<String, Map<String, Long>> payments =
                 mapPartyShop(transactions.getInvoicePayments(), payouts);
-        Map<String, Map<String, Long>> invoiceRefund =
+        Map<String, Map<String, Long>> refunds =
                 mapPartyShop(setNegativeNumber(transactions.getInvoiceRefunds()), payouts);
-        payouts.putAll(invoicePayment, invoiceRefund);
+        payouts.putAll(payments, refunds);
         return payouts;
     }
 
@@ -60,13 +60,13 @@ public class InvoicingHgClientService implements HgClientService {
         return partyMap;
     }
 
-    private MultiValueMap<String, Long> setNegativeNumber(MultiValueMap<String, Long> invoiceRefund) {
-        for (String key : invoiceRefund.keySet()) {
+    private MultiValueMap<String, Long> setNegativeNumber(MultiValueMap<String, Long> refunds) {
+        for (String refund : refunds.keySet()) {
             List<Long> list =
-                    invoiceRefund.get(key).stream().map(v -> v > 0 ? -v : v).collect(Collectors.toList());
-            invoiceRefund.put(key, list);
+                    refunds.get(refund).stream().map(v -> v > 0 ? -v : v).collect(Collectors.toList());
+            refunds.put(refund, list);
         }
-        return invoiceRefund;
+        return refunds;
     }
 
 }

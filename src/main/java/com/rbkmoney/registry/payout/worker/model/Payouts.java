@@ -9,9 +9,13 @@ import java.util.Map;
 public class Payouts {
     public Map<String, Map<String, Long>> payouts = new HashMap<>();
 
-    public void putAll(Map<String, Map<String, Long>> invoicePayment,
-                       Map<String, Map<String, Long>> invoiceRefund) {
-        payouts.putAll(invoicePayment);
-        payouts.putAll(invoiceRefund);
+    public void putAll(Map<String, Map<String, Long>> payment,
+                       Map<String, Map<String, Long>> refund) {
+        if (payment != null) {
+            payouts.putAll(payment);
+        }
+        if (refund != null) {
+            payouts.putAll(refund);
+        }
     }
 }
