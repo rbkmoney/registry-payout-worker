@@ -1,8 +1,7 @@
-package com.rbkmoney.registry.payout.worker.parser.rsb;
+package com.rbkmoney.registry.payout.worker.parser;
 
 import com.rbkmoney.registry.payout.worker.exception.RegistryPayoutWorkerException;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
-import com.rbkmoney.registry.payout.worker.parser.RegistryParser;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;

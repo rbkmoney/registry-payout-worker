@@ -1,9 +1,8 @@
-package com.rbkmoney.registry.payout.worker.service.hg.rsb;
+package com.rbkmoney.registry.payout.worker.service.hg;
 
 import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.registry.payout.worker.model.Payouts;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
-import com.rbkmoney.registry.payout.worker.service.hg.HgClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;

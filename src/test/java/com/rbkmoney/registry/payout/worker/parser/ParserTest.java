@@ -2,7 +2,6 @@ package com.rbkmoney.registry.payout.worker.parser;
 
 import com.rbkmoney.registry.payout.worker.RegistryPayoutWorkerApplication;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
-import com.rbkmoney.registry.payout.worker.parser.rsb.RsbParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

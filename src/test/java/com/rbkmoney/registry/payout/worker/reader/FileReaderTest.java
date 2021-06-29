@@ -4,7 +4,7 @@ import com.rbkmoney.registry.payout.worker.ftp.TestFtpClient;
 import com.rbkmoney.registry.payout.worker.ftp.TestFtpServer;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
 import com.rbkmoney.registry.payout.worker.parser.RegistryParser;
-import com.rbkmoney.registry.payout.worker.parser.rsb.RsbParser;
+import com.rbkmoney.registry.payout.worker.parser.RsbParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;

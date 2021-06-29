@@ -1,11 +1,12 @@
 package com.rbkmoney.registry.payout.worker.service;
 
-import com.rbkmoney.registry.payout.worker.config.FtpConfiguration;
-import com.rbkmoney.registry.payout.worker.exception.RegistryPayoutWorkerException;
+import com.rbkmoney.registry.payout.worker.config.properties.FtpProperties;
 import com.rbkmoney.registry.payout.worker.model.Payouts;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
 import com.rbkmoney.registry.payout.worker.reader.FtpTransactionsReader;
 import com.rbkmoney.registry.payout.worker.service.hg.HgClientService;
+import com.rbkmoney.registry.payout.worker.service.hg.SkipHgClientService;
+import com.rbkmoney.registry.payout.worker.service.payoutmngr.PayoutManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.*;
@@ -20,9 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RegistryPayoutWorkerService {
 
-    private final FtpConfiguration ftpConfiguration;
+    private final FtpProperties ftpProperties;
     private final FtpTransactionsReader ftpTransactionsReader;
-    private final List<HgClientService> hgClientService;
+    private final List<HgClientService> hgClientServices;
     private final PayoutManagerService payoutManagerService;
 
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
@@ -30,7 +31,7 @@ public class RegistryPayoutWorkerService {
         FTPClient ftpClient = new FTPClient();
         try {
             ftpClient = ftpClient();
-            ftpClient.changeWorkingDirectory(ftpConfiguration.getParentPath());
+            ftpClient.changeWorkingDirectory(ftpProperties.getParentPath());
             FTPFile[] ftpDirs = ftpClient.listDirectories();
             for (FTPFile ftpDir : ftpDirs) {
                 if (ftpDir.getName().equals(".") || ftpDir.getName().equals("..")) {
@@ -43,10 +44,10 @@ public class RegistryPayoutWorkerService {
                         transactions.getInvoicePayments().size(),
                         transactions.getInvoiceRefunds().size(),
                         ftpDir.getName());
-                Payouts payouts = hgClientService.stream()
-                        .filter(parser -> parser.isGetPayouts(ftpDir.getName()))
+                Payouts payouts = hgClientServices.stream()
+                        .filter(hgClientService -> hgClientService.isGetPayouts(ftpDir.getName()))
                         .findFirst()
-                        .orElseThrow(RegistryPayoutWorkerException::new)
+                        .orElse(new SkipHgClientService())
                         .getPayouts(transactions);
                 payoutManagerService.sendPayouts(payouts);
             }
@@ -59,8 +60,8 @@ public class RegistryPayoutWorkerService {
 
     public FTPClient ftpClient() throws IOException {
         FTPClient ftpClient = new FTPClient();
-        ftpClient.connect(ftpConfiguration.getHost());
-        ftpClient.login(ftpConfiguration.getUsername(), ftpConfiguration.getPassword());
+        ftpClient.connect(ftpProperties.getHost());
+        ftpClient.login(ftpProperties.getUsername(), ftpProperties.getPassword());
         ftpClient.enterLocalPassiveMode();
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         return ftpClient;

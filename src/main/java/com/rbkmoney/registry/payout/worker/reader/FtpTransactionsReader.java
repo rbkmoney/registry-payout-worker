@@ -1,8 +1,8 @@
 package com.rbkmoney.registry.payout.worker.reader;
 
-import com.rbkmoney.registry.payout.worker.exception.RegistryPayoutWorkerException;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
 import com.rbkmoney.registry.payout.worker.parser.RegistryParser;
+import com.rbkmoney.registry.payout.worker.parser.SkipParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
@@ -33,7 +33,7 @@ public class FtpTransactionsReader {
                 Transactions fileTransactions = parsers.stream()
                         .filter(parser -> parser.isParse(pathDir))
                         .findFirst()
-                        .orElseThrow(RegistryPayoutWorkerException::new)
+                        .orElse(new SkipParser())
                         .parse(inputStream);
                 transactions.addAll(fileTransactions);
                 inputStream.close();

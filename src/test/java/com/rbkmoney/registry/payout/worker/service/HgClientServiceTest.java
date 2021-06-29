@@ -2,7 +2,7 @@ package com.rbkmoney.registry.payout.worker.service;
 
 import com.rbkmoney.registry.payout.worker.RegistryPayoutWorkerApplication;
 import com.rbkmoney.registry.payout.worker.model.Payouts;
-import com.rbkmoney.registry.payout.worker.service.hg.rsb.InvoicingHgClientService;
+import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

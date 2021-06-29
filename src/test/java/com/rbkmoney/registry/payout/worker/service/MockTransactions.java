@@ -1,12 +1,13 @@
 package com.rbkmoney.registry.payout.worker.service;
 
-import com.rbkmoney.damsel.payment_processing.Invoice;
-import com.rbkmoney.damsel.payment_processing.InvoicingSrv;
+import com.rbkmoney.damsel.domain.CurrencyRef;
+import com.rbkmoney.damsel.domain.ShopAccount;
+import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
 import com.rbkmoney.registry.payout.worker.model.Transactions;
-import com.rbkmoney.registry.payout.worker.service.hg.rsb.InvoicingHgClientService;
+import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import org.apache.thrift.TException;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.util.LinkedMultiValueMap;
@@ -15,12 +16,16 @@ import org.springframework.util.MultiValueMap;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class MockTransactions {
 
     @MockBean
     private InvoicingSrv.Iface invoicingClient;
+
+    @MockBean
+    private PartyManagementSrv.Iface partyManagementClient;
 
     public Transactions createTransactions() throws TException, IOException {
         MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
@@ -33,6 +38,7 @@ public class MockTransactions {
         transactions.setInvoicePayments(payments);
         transactions.setInvoiceRefunds(refunds);
         mockPayment(transactions.getInvoicePayments(), transactions.getInvoiceRefunds());
+        mockPartyManagement();
         return transactions;
     }
 
@@ -74,5 +80,11 @@ public class MockTransactions {
                 .setId(invoiceId)
                 .setShopId(shopId)
                 .setOwnerId(partyId);
+    }
+
+    private void mockPartyManagement() throws TException {
+        when(partyManagementClient.getShopAccount(any(), any(), any()))
+                .thenReturn(new ShopAccount().setCurrency(new CurrencyRef("RUB")));
+
     }
 }

@@ -1,4 +1,4 @@
-package com.rbkmoney.registry.payout.worker.config;
+package com.rbkmoney.registry.payout.worker.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "ftp")
-public class FtpConfiguration {
+public class FtpProperties {
     private String host;
     private int port;
     private String username;
