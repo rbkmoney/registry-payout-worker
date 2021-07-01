@@ -6,16 +6,15 @@ import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
-import com.rbkmoney.registry.payout.worker.model.RegistryOperations;
 import com.rbkmoney.registry.payout.worker.parser.RsbParser;
 import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.util.MultiValueMap;
 
 import java.io.*;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -38,21 +37,15 @@ public class MockTransactions {
     }
 
 
-    public RegistryOperations mockOperations() throws TException, IOException {
+    public Map<String, Long> mockOperations() throws TException, IOException {
         File file = new File("src/test/resources/test.xls");
         InputStream inputStream = new FileInputStream(file);
-        RegistryOperations registryOperations = rsbParser.parse(inputStream);
-        mockPayment(registryOperations.getPayments(), registryOperations.getRefunds());
+        Map<String, Long> registryOperations = rsbParser.parse(inputStream);
+        mockPayment(registryOperations);
         return registryOperations;
     }
 
-    private void mockPayment(MultiValueMap<String, Long> invoicePaym,
-                             MultiValueMap<String, Long> invoiceRef) throws TException, IOException {
-        mockPayment(invoicePaym);
-        mockPayment(invoiceRef);
-    }
-
-    private void mockPayment(MultiValueMap<String, Long> map) throws TException, IOException {
+    private void mockPayment(Map<String, Long> map) throws TException, IOException {
         for (String key : map.keySet()) {
             if (Integer.parseInt(key) < 3) {
                 when(invoicingClient.get(InvoicingHgClientService.USER_INFO, key,
