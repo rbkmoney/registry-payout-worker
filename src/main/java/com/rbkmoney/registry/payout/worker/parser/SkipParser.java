@@ -1,6 +1,6 @@
 package com.rbkmoney.registry.payout.worker.parser;
 
-import com.rbkmoney.registry.payout.worker.model.Transactions;
+import com.rbkmoney.registry.payout.worker.model.FilesOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +16,9 @@ public class SkipParser implements RegistryParser {
     }
 
     @Override
-    public Transactions parse(InputStream inputStream) {
+    public FilesOperations parse(InputStream inputStream) {
         log.error("No RegistryParsers available to parse file.");
-        return new Transactions();
+        return new FilesOperations();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.rbkmoney.registry.payout.worker.parser;
 
-import com.rbkmoney.registry.payout.worker.model.Transactions;
+import com.rbkmoney.registry.payout.worker.model.FilesOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -28,8 +28,8 @@ public class RsbParser implements RegistryParser {
     }
 
     @Override
-    public Transactions parse(InputStream inputStream) {
-        Transactions transactions = new Transactions();
+    public FilesOperations parse(InputStream inputStream) {
+        FilesOperations filesOperations = new FilesOperations();
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIter = sheet.rowIterator();
@@ -41,20 +41,20 @@ public class RsbParser implements RegistryParser {
                 String paymentAmount = row.getCell(4).getStringCellValue();
                 if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
                     long amount = Long.parseLong(paymentAmount.replace(",", ""));
-                    String invoice = merchTrxId.substring(0, merchTrxId.indexOf("."));
+                    String invoiceId = merchTrxId.substring(0, merchTrxId.indexOf("."));
                     if (amount > 0) {
-                        payments.add(invoice, amount);
+                        payments.add(invoiceId, amount);
                     } else {
-                        refunds.add(invoice, Math.abs(amount));
+                        refunds.add(invoiceId, Math.abs(amount));
                     }
                 }
             }
-            transactions.setInvoicePayments(payments);
-            transactions.setInvoiceRefunds(refunds);
+            filesOperations.setPayments(payments);
+            filesOperations.setRefunds(refunds);
         } catch (EmptyFileException | InvalidFormatException | IOException ex) {
             log.error("Failed parse registry.", ex);
         }
-        return transactions;
+        return filesOperations;
     }
 
     private boolean isNumeric(String strNum) {

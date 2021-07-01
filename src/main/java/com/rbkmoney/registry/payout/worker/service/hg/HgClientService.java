@@ -1,11 +1,11 @@
 package com.rbkmoney.registry.payout.worker.service.hg;
 
-import com.rbkmoney.registry.payout.worker.model.Payouts;
-import com.rbkmoney.registry.payout.worker.model.Transactions;
+import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
+import com.rbkmoney.registry.payout.worker.model.FilesOperations;
 
 public interface HgClientService {
 
     boolean isGetPayouts(String provider);
 
-    Payouts getPayouts(Transactions transactions);
+    PayoutStorage getPayouts(FilesOperations filesOperations);
 }

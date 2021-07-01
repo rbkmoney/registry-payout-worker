@@ -1,6 +1,6 @@
 package com.rbkmoney.registry.payout.worker.reader;
 
-import com.rbkmoney.registry.payout.worker.model.Transactions;
+import com.rbkmoney.registry.payout.worker.model.FilesOperations;
 import com.rbkmoney.registry.payout.worker.parser.RegistryParser;
 import com.rbkmoney.registry.payout.worker.parser.SkipParser;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class FtpTransactionsReader {
     private final List<RegistryParser> parsers;
     private static final String PATH_TO_PROCESSED_FILE = "processed";
 
-    public Transactions readFiles(FTPClient ftpClient, String pathDir) throws IOException {
-        Transactions transactions = new Transactions();
+    public FilesOperations readFiles(FTPClient ftpClient, String pathDir) throws IOException {
+        FilesOperations filesOperations = new FilesOperations();
         FTPFile[] ftpFiles = ftpClient.listFiles();
         for (FTPFile ftpFile : ftpFiles) {
             if (ftpFile.isFile()) {
@@ -30,19 +30,19 @@ public class FtpTransactionsReader {
                 if (ftpClient.completePendingCommand()) {
                     log.info("File {} was received successfully.", ftpFile.getName());
                 }
-                Transactions fileTransactions = parsers.stream()
+                FilesOperations fileOperations = parsers.stream()
                         .filter(parser -> parser.isParse(pathDir))
                         .findFirst()
                         .orElse(new SkipParser())
                         .parse(inputStream);
-                transactions.addAll(fileTransactions);
+                filesOperations.addAll(fileOperations);
                 inputStream.close();
                 ftpClient.makeDirectory(PATH_TO_PROCESSED_FILE);
                 ftpClient.rename(ftpClient.printWorkingDirectory() + "/" + ftpFile.getName(),
                         ftpClient.printWorkingDirectory() + "/" + PATH_TO_PROCESSED_FILE + "/" + ftpFile.getName());
             }
         }
-        return transactions;
+        return filesOperations;
     }
 
 }

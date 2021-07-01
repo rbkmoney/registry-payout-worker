@@ -2,7 +2,7 @@ package com.rbkmoney.registry.payout.worker.reader;
 
 import com.rbkmoney.registry.payout.worker.ftp.TestFtpClient;
 import com.rbkmoney.registry.payout.worker.ftp.TestFtpServer;
-import com.rbkmoney.registry.payout.worker.model.Transactions;
+import com.rbkmoney.registry.payout.worker.model.FilesOperations;
 import com.rbkmoney.registry.payout.worker.parser.RegistryParser;
 import com.rbkmoney.registry.payout.worker.parser.RsbParser;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +40,11 @@ public class FileReaderTest {
                     continue;
                 }
                 ftpClient.changeWorkingDirectory(ftpDir.getName());
-                Transactions transactions = filereader().readFiles(ftpClient, "rsb");
-                assertEquals(10, transactions.getInvoicePayments().size());
-                assertEquals(1, transactions.getInvoiceRefunds().size());
-                assertEquals(97000, transactions.getInvoicePayments().get("1Tgz70wxfxA").get(0));
-                assertEquals(24250, transactions.getInvoiceRefunds().get("1ThpZ6eiyh6").get(0), 0);
+                FilesOperations filesOperations = filereader().readFiles(ftpClient, "rsb");
+                assertEquals(10, filesOperations.getPayments().size());
+                assertEquals(1, filesOperations.getRefunds().size());
+                assertEquals(97000, filesOperations.getPayments().get("1Tgz70wxfxA").get(0));
+                assertEquals(24250, filesOperations.getRefunds().get("1ThpZ6eiyh6").get(0), 0);
                 ftpClient.changeToParentDirectory();
             }
             deleteFileFromFtp(ftpClient);

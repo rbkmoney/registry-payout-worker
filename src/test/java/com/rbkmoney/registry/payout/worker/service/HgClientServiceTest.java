@@ -1,7 +1,7 @@
 package com.rbkmoney.registry.payout.worker.service;
 
 import com.rbkmoney.registry.payout.worker.RegistryPayoutWorkerApplication;
-import com.rbkmoney.registry.payout.worker.model.Payouts;
+import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
 import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.Test;
@@ -21,19 +21,19 @@ public class HgClientServiceTest extends MockTransactions {
 
     @Test
     void testHgClientService() throws TException, IOException {
-        Payouts payouts = hgClientService.getPayouts(createTransactions());
-        assertEquals(4, payouts.getPayouts().size());
-        assertEquals(1, payouts.getPayouts().get("testPartyId-1").size());
-        assertEquals(2, payouts.getPayouts().get("testPartyId0").size());
-        assertEquals(2, payouts.getPayouts().get("testPartyId1").size());
-        assertEquals(1, payouts.getPayouts().get("testPartyId2").size());
-        assertEquals(-5, payouts.getPayouts().get("testPartyId-1").get("testShopId-1"));
-        assertEquals(11, payouts.getPayouts().get("testPartyId0").get("testShopId0"));
-        assertEquals(17, payouts.getPayouts().get("testPartyId0").get("testShopId1"));
-        assertEquals(15, payouts.getPayouts().get("testPartyId1").get("testShopId1"));
-        assertEquals(22, payouts.getPayouts().get("testPartyId1").get("testShopId2"));
-        assertEquals(17, payouts.getPayouts().get("testPartyId2").get("testShopId2"));
-        assertNull(payouts.getPayouts().get("testPartyId0").get("testShopId2"));
+        PayoutStorage payoutStorage = hgClientService.getPayouts(createTransactions());
+        assertEquals(4, payoutStorage.getPayouts().size());
+        assertEquals(1, payoutStorage.getPayouts().get("testPartyId-1").size());
+        assertEquals(2, payoutStorage.getPayouts().get("testPartyId0").size());
+        assertEquals(2, payoutStorage.getPayouts().get("testPartyId1").size());
+        assertEquals(1, payoutStorage.getPayouts().get("testPartyId2").size());
+        assertEquals(-5, payoutStorage.getPayouts().get("testPartyId-1").get("testShopId-1"));
+        assertEquals(11, payoutStorage.getPayouts().get("testPartyId0").get("testShopId0"));
+        assertEquals(17, payoutStorage.getPayouts().get("testPartyId0").get("testShopId1"));
+        assertEquals(15, payoutStorage.getPayouts().get("testPartyId1").get("testShopId1"));
+        assertEquals(22, payoutStorage.getPayouts().get("testPartyId1").get("testShopId2"));
+        assertEquals(17, payoutStorage.getPayouts().get("testPartyId2").get("testShopId2"));
+        assertNull(payoutStorage.getPayouts().get("testPartyId0").get("testShopId2"));
     }
 
 }

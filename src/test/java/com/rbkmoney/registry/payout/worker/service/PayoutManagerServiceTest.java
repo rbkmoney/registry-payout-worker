@@ -2,7 +2,7 @@ package com.rbkmoney.registry.payout.worker.service;
 
 import com.rbkmoney.payout.manager.PayoutParams;
 import com.rbkmoney.registry.payout.worker.RegistryPayoutWorkerApplication;
-import com.rbkmoney.registry.payout.worker.model.Payouts;
+import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
 import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import com.rbkmoney.registry.payout.worker.service.payoutmngr.PayoutManagerService;
 import org.apache.thrift.TException;
@@ -26,8 +26,8 @@ public class PayoutManagerServiceTest extends MockTransactions {
 
     @Test
     void testPayoutManagerClientService() throws TException, IOException {
-        Payouts payouts = hgClientService.getPayouts(createTransactions());
-        List<PayoutParams> payoutParams = payoutManagerService.createPayouts(payouts);
+        PayoutStorage payoutStorage = hgClientService.getPayouts(createTransactions());
+        List<PayoutParams> payoutParams = payoutManagerService.createPayouts(payoutStorage);
         assertEquals(5, payoutParams.size());
         assertEquals(17, payoutParams.get(0).getCash().getAmount());
         assertEquals("testShopId2", payoutParams.get(0).getShopParams().getShopId());

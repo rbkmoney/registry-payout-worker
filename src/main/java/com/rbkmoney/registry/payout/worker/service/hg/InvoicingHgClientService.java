@@ -1,8 +1,8 @@
 package com.rbkmoney.registry.payout.worker.service.hg;
 
 import com.rbkmoney.damsel.payment_processing.*;
-import com.rbkmoney.registry.payout.worker.model.Payouts;
-import com.rbkmoney.registry.payout.worker.model.Transactions;
+import com.rbkmoney.registry.payout.worker.model.FilesOperations;
+import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
@@ -31,33 +31,33 @@ public class InvoicingHgClientService implements HgClientService {
     }
 
     @Override
-    public Payouts getPayouts(Transactions transactions) {
-        Payouts payouts = new Payouts();
+    public PayoutStorage getPayouts(FilesOperations filesOperations) {
+        PayoutStorage payoutStorage = new PayoutStorage();
         Map<String, Map<String, Long>> payments =
-                mapPartyShop(transactions.getInvoicePayments(), payouts);
+                mapPartyShop(filesOperations.getPayments(), payoutStorage);
         Map<String, Map<String, Long>> refunds =
-                mapPartyShop(setNegativeNumber(transactions.getInvoiceRefunds()), payouts);
-        payouts.putAll(payments, refunds);
-        return payouts;
+                mapPartyShop(setNegativeNumber(filesOperations.getRefunds()), payoutStorage);
+        payoutStorage.putAll(payments, refunds);
+        return payoutStorage;
     }
 
-    private Map<String, Map<String, Long>> mapPartyShop(MultiValueMap<String, Long> map,
-                                                        Payouts payouts) {
-        Map<String, Map<String, Long>> partyMap = payouts.getPayouts();
-        for (String key : map.keySet()) {
+    private Map<String, Map<String, Long>> mapPartyShop(MultiValueMap<String, Long> invoices,
+                                                        PayoutStorage payoutStorage) {
+        Map<String, Map<String, Long>> payouts = payoutStorage.getPayouts();
+        for (String invoiceId : invoices.keySet()) {
             try {
-                Invoice invoice = invoicing.get(USER_INFO, key, EVENT_RANGE);
-                String party = invoice.getInvoice().getOwnerId();
-                String shop = invoice.getInvoice().getShopId();
-                Map<String, Long> shopMap = partyMap.get(party) != null ? partyMap.get(party) : new HashMap<>();
-                long sum = map.get(key).stream().mapToLong(a -> a).sum();
-                shopMap.merge(shop, sum, Long::sum);
-                partyMap.put(party, shopMap);
+                Invoice invoice = invoicing.get(USER_INFO, invoiceId, EVENT_RANGE);
+                String partyId = invoice.getInvoice().getOwnerId();
+                String shopId = invoice.getInvoice().getShopId();
+                Map<String, Long> shops = payouts.get(partyId) != null ? payouts.get(partyId) : new HashMap<>();
+                long sum = invoices.get(invoiceId).stream().mapToLong(a -> a).sum();
+                shops.merge(shopId, sum, Long::sum);
+                payouts.put(partyId, shops);
             } catch (TException e) {
                 log.error("Received error when get invoice ", e);
             }
         }
-        return partyMap;
+        return payouts;
     }
 
     private MultiValueMap<String, Long> setNegativeNumber(MultiValueMap<String, Long> refunds) {

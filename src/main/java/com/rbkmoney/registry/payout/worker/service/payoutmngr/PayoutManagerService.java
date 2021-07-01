@@ -4,7 +4,7 @@ import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.CurrencyRef;
 import com.rbkmoney.damsel.payment_processing.PartyManagementSrv;
 import com.rbkmoney.payout.manager.*;
-import com.rbkmoney.registry.payout.worker.model.Payouts;
+import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
 import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ public class PayoutManagerService {
     private final PayoutManagementSrv.Iface payoutManagerClient;
     private final PartyManagementSrv.Iface partyManagementClient;
 
-    public void sendPayouts(Payouts payouts) throws TException {
-        createPayouts(payouts).forEach((PayoutParams payoutParams) -> {
+    public void sendPayouts(PayoutStorage payoutStorage) throws TException {
+        createPayouts(payoutStorage).forEach((PayoutParams payoutParams) -> {
             try {
                 payoutManagerClient.createPayout(payoutParams);
                 log.info("Payout created with params {}", payoutParams);
@@ -32,21 +32,21 @@ public class PayoutManagerService {
         });
     }
 
-    public List<PayoutParams> createPayouts(Payouts payouts) throws TException {
+    public List<PayoutParams> createPayouts(PayoutStorage payoutStorage) throws TException {
         List<PayoutParams> listPayoutParams = new ArrayList<>();
-        for (String party : payouts.getPayouts().keySet()) {
-            Map<String, Long> shops = payouts.getPayouts().get(party);
-            for (String shop : shops.keySet()) {
-                if (shops.get(shop) > 0) {
+        for (String partyId : payoutStorage.getPayouts().keySet()) {
+            Map<String, Long> shops = payoutStorage.getPayouts().get(partyId);
+            for (String shopId : shops.keySet()) {
+                if (shops.get(shopId) > 0) {
                     Cash cash = new Cash();
-                    cash.setAmount(shops.get(shop));
+                    cash.setAmount(shops.get(shopId));
                     CurrencyRef currencyRef = partyManagementClient
-                            .getShopAccount(InvoicingHgClientService.USER_INFO, party, shop)
+                            .getShopAccount(InvoicingHgClientService.USER_INFO, partyId, shopId)
                             .getCurrency();
                     cash.setCurrency(currencyRef);
                     ShopParams shopParams = new ShopParams();
-                    shopParams.setPartyId(party);
-                    shopParams.setShopId(shop);
+                    shopParams.setPartyId(partyId);
+                    shopParams.setShopId(shopId);
                     PayoutParams payoutParams = new PayoutParams();
                     payoutParams.setCash(cash);
                     payoutParams.setShopParams(shopParams);
