@@ -2,10 +2,7 @@ package com.rbkmoney.registry.payout.worker.service;
 
 import com.rbkmoney.registry.payout.worker.config.properties.FtpProperties;
 import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
-import com.rbkmoney.registry.payout.worker.model.FilesOperations;
-import com.rbkmoney.registry.payout.worker.reader.FtpTransactionsReader;
-import com.rbkmoney.registry.payout.worker.service.hg.HgClientService;
-import com.rbkmoney.registry.payout.worker.service.hg.SkipHgClientService;
+import com.rbkmoney.registry.payout.worker.reader.FilePayoutStorageReader;
 import com.rbkmoney.registry.payout.worker.service.payoutmngr.PayoutManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -22,8 +18,7 @@ import java.util.List;
 public class RegistryPayoutWorkerService {
 
     private final FtpProperties ftpProperties;
-    private final FtpTransactionsReader ftpTransactionsReader;
-    private final List<HgClientService> hgClientServices;
+    private final FilePayoutStorageReader filePayoutStorageReader;
     private final PayoutManagerService payoutManagerService;
 
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
@@ -38,17 +33,8 @@ public class RegistryPayoutWorkerService {
                     continue;
                 }
                 ftpClient.changeWorkingDirectory(ftpDir.getName());
-                FilesOperations filesOperations = ftpTransactionsReader.readFiles(ftpClient, ftpDir.getName());
+                PayoutStorage payoutStorage = filePayoutStorageReader.readFiles(ftpClient, ftpDir.getName());
                 ftpClient.changeToParentDirectory();
-                log.info("Read {} payments and {} refunds from {}",
-                        filesOperations.getPayments().size(),
-                        filesOperations.getRefunds().size(),
-                        ftpDir.getName());
-                PayoutStorage payoutStorage = hgClientServices.stream()
-                        .filter(hgClientService -> hgClientService.isGetPayouts(ftpDir.getName()))
-                        .findFirst()
-                        .orElse(new SkipHgClientService())
-                        .getPayouts(filesOperations);
                 payoutManagerService.sendPayouts(payoutStorage);
             }
         } catch (Exception ex) {

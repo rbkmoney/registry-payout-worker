@@ -1,6 +1,6 @@
 package com.rbkmoney.registry.payout.worker.parser;
 
-import com.rbkmoney.registry.payout.worker.model.FilesOperations;
+import com.rbkmoney.registry.payout.worker.model.RegistryOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -14,22 +14,14 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import static com.rbkmoney.registry.payout.worker.constant.PathToReadConstant.RSB;
-
 @Slf4j
 @Component
-public class RsbParser implements RegistryParser {
+public class RsbParser {
 
     private static final String NUMERIC_PATTERN = "-?\\d+(,\\d+)?";
 
-    @Override
-    public boolean isParse(String provider) {
-        return RSB.equals(provider);
-    }
-
-    @Override
-    public FilesOperations parse(InputStream inputStream) {
-        FilesOperations filesOperations = new FilesOperations();
+    public RegistryOperations parse(InputStream inputStream) {
+        RegistryOperations registryOperations = new RegistryOperations();
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIter = sheet.rowIterator();
@@ -49,12 +41,12 @@ public class RsbParser implements RegistryParser {
                     }
                 }
             }
-            filesOperations.setPayments(payments);
-            filesOperations.setRefunds(refunds);
+            registryOperations.setPayments(payments);
+            registryOperations.setRefunds(refunds);
         } catch (EmptyFileException | InvalidFormatException | IOException ex) {
             log.error("Failed parse registry.", ex);
         }
-        return filesOperations;
+        return registryOperations;
     }
 
     private boolean isNumeric(String strNum) {

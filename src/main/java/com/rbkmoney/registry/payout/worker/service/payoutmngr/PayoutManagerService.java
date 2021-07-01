@@ -11,7 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -34,24 +35,25 @@ public class PayoutManagerService {
 
     public List<PayoutParams> createPayouts(PayoutStorage payoutStorage) throws TException {
         List<PayoutParams> listPayoutParams = new ArrayList<>();
-        for (String partyId : payoutStorage.getPayouts().keySet()) {
-            Map<String, Long> shops = payoutStorage.getPayouts().get(partyId);
-            for (String shopId : shops.keySet()) {
-                if (shops.get(shopId) > 0) {
-                    Cash cash = new Cash();
-                    cash.setAmount(shops.get(shopId));
-                    CurrencyRef currencyRef = partyManagementClient
-                            .getShopAccount(InvoicingHgClientService.USER_INFO, partyId, shopId)
-                            .getCurrency();
-                    cash.setCurrency(currencyRef);
-                    ShopParams shopParams = new ShopParams();
-                    shopParams.setPartyId(partyId);
-                    shopParams.setShopId(shopId);
-                    PayoutParams payoutParams = new PayoutParams();
-                    payoutParams.setCash(cash);
-                    payoutParams.setShopParams(shopParams);
-                    listPayoutParams.add(payoutParams);
-                }
+        for (PayoutStorage.PartyShop partyShop : payoutStorage.getPayouts().keySet()) {
+            Long amount = payoutStorage.getPayouts().get(partyShop);
+            if (amount > 0) {
+                Cash cash = new Cash();
+                cash.setAmount(amount);
+                CurrencyRef currencyRef = partyManagementClient
+                        .getShopAccount(
+                                InvoicingHgClientService.USER_INFO,
+                                partyShop.getPartyId(),
+                                partyShop.getShopId())
+                        .getCurrency();
+                cash.setCurrency(currencyRef);
+                ShopParams shopParams = new ShopParams();
+                shopParams.setPartyId(partyShop.getPartyId());
+                shopParams.setShopId(partyShop.getShopId());
+                PayoutParams payoutParams = new PayoutParams();
+                payoutParams.setCash(cash);
+                payoutParams.setShopParams(shopParams);
+                listPayoutParams.add(payoutParams);
             }
         }
         return listPayoutParams;

@@ -21,19 +21,37 @@ public class HgClientServiceTest extends MockTransactions {
 
     @Test
     void testHgClientService() throws TException, IOException {
-        PayoutStorage payoutStorage = hgClientService.getPayouts(createTransactions());
-        assertEquals(4, payoutStorage.getPayouts().size());
-        assertEquals(1, payoutStorage.getPayouts().get("testPartyId-1").size());
-        assertEquals(2, payoutStorage.getPayouts().get("testPartyId0").size());
-        assertEquals(2, payoutStorage.getPayouts().get("testPartyId1").size());
-        assertEquals(1, payoutStorage.getPayouts().get("testPartyId2").size());
-        assertEquals(-5, payoutStorage.getPayouts().get("testPartyId-1").get("testShopId-1"));
-        assertEquals(11, payoutStorage.getPayouts().get("testPartyId0").get("testShopId0"));
-        assertEquals(17, payoutStorage.getPayouts().get("testPartyId0").get("testShopId1"));
-        assertEquals(15, payoutStorage.getPayouts().get("testPartyId1").get("testShopId1"));
-        assertEquals(22, payoutStorage.getPayouts().get("testPartyId1").get("testShopId2"));
-        assertEquals(17, payoutStorage.getPayouts().get("testPartyId2").get("testShopId2"));
-        assertNull(payoutStorage.getPayouts().get("testPartyId0").get("testShopId2"));
+        PayoutStorage payoutStorage = hgClientService.getPayouts(mockOperations(),
+                new PayoutStorage());
+        assertEquals(6, payoutStorage.getPayouts().size());
+        assertEquals(-500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .partyId("testPartyId-1")
+                .shopId("testShopId-1")
+                .build()));
+        assertEquals(1100, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .partyId("testPartyId0")
+                .shopId("testShopId0")
+                .build()));
+        assertEquals(1700, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .partyId("testPartyId0")
+                .shopId("testShopId1")
+                .build()));
+        assertEquals(1500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .partyId("testPartyId1")
+                .shopId("testShopId1")
+                .build()));
+        assertEquals(2200, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .partyId("testPartyId1")
+                .shopId("testShopId2")
+                .build()));
+        assertEquals(1700, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .partyId("testPartyId2")
+                .shopId("testShopId2")
+                .build()));
+        assertNull(payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .partyId("testPartyId0")
+                .shopId("testShopId2")
+                .build()));
     }
 
 }

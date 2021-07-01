@@ -6,15 +6,16 @@ import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
-import com.rbkmoney.registry.payout.worker.model.FilesOperations;
+import com.rbkmoney.registry.payout.worker.model.RegistryOperations;
+import com.rbkmoney.registry.payout.worker.parser.RsbParser;
 import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import org.apache.thrift.TException;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -27,19 +28,22 @@ public class MockTransactions {
     @MockBean
     private PartyManagementSrv.Iface partyManagementClient;
 
-    public FilesOperations createTransactions() throws TException, IOException {
-        MultiValueMap<String, Long> payments = new LinkedMultiValueMap<>();
-        MultiValueMap<String, Long> refunds = new LinkedMultiValueMap<>();
-        for (int i = 0; i < 5; i++) {
-            payments.put(String.valueOf(i), Arrays.asList((long) i + 5, (long) i + 9));
-            refunds.put(String.valueOf(i - 1), Arrays.asList((long) i - 2, (long) i - 3));
-        }
-        FilesOperations filesOperations = new FilesOperations();
-        filesOperations.setPayments(payments);
-        filesOperations.setRefunds(refunds);
-        mockPayment(filesOperations.getPayments(), filesOperations.getRefunds());
+    @Autowired
+    private RsbParser rsbParser;
+
+    @BeforeEach
+    public void init() throws TException, IOException {
+        mockOperations();
         mockPartyManagement();
-        return filesOperations;
+    }
+
+
+    public RegistryOperations mockOperations() throws TException, IOException {
+        File file = new File("src/test/resources/test.xls");
+        InputStream inputStream = new FileInputStream(file);
+        RegistryOperations registryOperations = rsbParser.parse(inputStream);
+        mockPayment(registryOperations.getPayments(), registryOperations.getRefunds());
+        return registryOperations;
     }
 
     private void mockPayment(MultiValueMap<String, Long> invoicePaym,

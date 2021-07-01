@@ -26,22 +26,23 @@ public class PayoutManagerServiceTest extends MockTransactions {
 
     @Test
     void testPayoutManagerClientService() throws TException, IOException {
-        PayoutStorage payoutStorage = hgClientService.getPayouts(createTransactions());
+        PayoutStorage payoutStorage = hgClientService.getPayouts(mockOperations(),
+                new PayoutStorage());
         List<PayoutParams> payoutParams = payoutManagerService.createPayouts(payoutStorage);
         assertEquals(5, payoutParams.size());
-        assertEquals(17, payoutParams.get(0).getCash().getAmount());
+        assertEquals(1700, payoutParams.get(0).getCash().getAmount());
         assertEquals("testShopId2", payoutParams.get(0).getShopParams().getShopId());
         assertEquals("testPartyId2", payoutParams.get(0).getShopParams().getPartyId());
-        assertEquals(15, payoutParams.get(1).getCash().getAmount());
-        assertEquals("testShopId1", payoutParams.get(1).getShopParams().getShopId());
+        assertEquals(2200, payoutParams.get(1).getCash().getAmount());
+        assertEquals("testShopId2", payoutParams.get(1).getShopParams().getShopId());
         assertEquals("testPartyId1", payoutParams.get(1).getShopParams().getPartyId());
-        assertEquals(22, payoutParams.get(2).getCash().getAmount());
-        assertEquals("testShopId2", payoutParams.get(2).getShopParams().getShopId());
+        assertEquals(1500, payoutParams.get(2).getCash().getAmount());
+        assertEquals("testShopId1", payoutParams.get(2).getShopParams().getShopId());
         assertEquals("testPartyId1", payoutParams.get(2).getShopParams().getPartyId());
-        assertEquals(17, payoutParams.get(3).getCash().getAmount());
+        assertEquals(1700, payoutParams.get(3).getCash().getAmount());
         assertEquals("testShopId1", payoutParams.get(3).getShopParams().getShopId());
         assertEquals("testPartyId0", payoutParams.get(3).getShopParams().getPartyId());
-        assertEquals(11, payoutParams.get(4).getCash().getAmount());
+        assertEquals(1100, payoutParams.get(4).getCash().getAmount());
         assertEquals("testShopId0", payoutParams.get(4).getShopParams().getShopId());
         assertEquals("testPartyId0", payoutParams.get(4).getShopParams().getPartyId());
     }
