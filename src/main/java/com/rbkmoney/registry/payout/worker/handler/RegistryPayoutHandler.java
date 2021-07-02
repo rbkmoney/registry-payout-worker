@@ -8,5 +8,5 @@ public interface RegistryPayoutHandler {
 
     boolean isHadle(String provider);
 
-    PayoutStorage handle(InputStream inputStream, PayoutStorage payouts);
+    PayoutStorage handle(InputStream inputStream, PayoutStorage payoutStorage);
 }
