@@ -21,12 +21,12 @@ public class HgClientServiceTest extends MockTransactions {
 
     @Test
     void testHgClientService() throws TException, IOException {
-        PayoutStorage payoutStorage = hgClientService.getPayouts(mockOperations(),
+        PayoutStorage payoutStorage = hgClientService.getPayouts(ctreateOperations(),
                 new PayoutStorage());
         assertEquals(6, payoutStorage.getPayouts().size());
         assertEquals(-500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
-                .partyId("testPartyId-1")
-                .shopId("testShopId-1")
+                .partyId("testPartyId5")
+                .shopId("testShopId6")
                 .build()));
         assertEquals(1100, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
                 .partyId("testPartyId0")

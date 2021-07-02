@@ -26,7 +26,7 @@ public class PayoutManagerServiceTest extends MockTransactions {
 
     @Test
     void testPayoutManagerClientService() throws TException, IOException {
-        PayoutStorage payoutStorage = hgClientService.getPayouts(mockOperations(),
+        PayoutStorage payoutStorage = hgClientService.getPayouts(ctreateOperations(),
                 new PayoutStorage());
         List<PayoutParams> payoutParams = payoutManagerService.createPayouts(payoutStorage);
         assertEquals(5, payoutParams.size());

@@ -18,7 +18,7 @@ public class RsbParser {
     private static final String NUMERIC_PATTERN = "-?\\d+(,\\d+)?";
 
     public Map<String, Long> parse(InputStream inputStream) {
-        Map<String, Long> transactions = new HashMap<>();
+        Map<String, Long> registryOperations = new HashMap<>();
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIter = sheet.rowIterator();
@@ -29,13 +29,13 @@ public class RsbParser {
                 if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
                     long amount = Long.parseLong(paymentAmount.replace(",", ""));
                     String invoiceId = merchTrxId.substring(0, merchTrxId.indexOf("."));
-                    transactions.merge(invoiceId, amount, Long::sum);
+                    registryOperations.merge(invoiceId, amount, Long::sum);
                 }
             }
         } catch (EmptyFileException | InvalidFormatException | IOException ex) {
             log.error("Failed parse registry.", ex);
         }
-        return transactions;
+        return registryOperations;
     }
 
     private boolean isNumeric(String strNum) {

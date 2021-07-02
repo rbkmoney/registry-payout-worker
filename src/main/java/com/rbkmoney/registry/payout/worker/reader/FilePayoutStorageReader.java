@@ -30,12 +30,12 @@ public class FilePayoutStorageReader {
                 if (ftpClient.completePendingCommand()) {
                     log.info("File {} was received successfully.", ftpFile.getName());
                 }
-                PayoutStorage filePayout = handlers.stream()
+                PayoutStorage filePayoutStorage = handlers.stream()
                         .filter(handler -> handler.isHadle(pathDir))
                         .findFirst()
                         .orElse(new SkipRegistryPayoutPayoutHandler())
                         .handle(inputStream, payoutStorage);
-                payoutStorage.getPayouts().putAll(filePayout.getPayouts());
+                payoutStorage.getPayouts().putAll(filePayoutStorage.getPayouts());
                 inputStream.close();
                 ftpClient.makeDirectory(PATH_TO_PROCESSED_FILE);
                 ftpClient.rename(ftpClient.printWorkingDirectory() + "/" + ftpFile.getName(),

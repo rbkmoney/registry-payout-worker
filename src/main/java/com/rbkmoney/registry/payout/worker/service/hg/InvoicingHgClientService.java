@@ -25,16 +25,16 @@ public class InvoicingHgClientService {
         return payoutStorage;
     }
 
-    private void mapPartyShop(Map<String, Long> invoices,
+    private void mapPartyShop(Map<String, Long> registryOperations,
                               Map<PayoutStorage.PartyShop, Long> payouts) {
-        for (String invoiceId : invoices.keySet()) {
+        for (String invoiceId : registryOperations.keySet()) {
             try {
                 Invoice invoice = invoicing.get(USER_INFO, invoiceId, EVENT_RANGE);
                 PayoutStorage.PartyShop partyShop = PayoutStorage.PartyShop.builder()
                         .partyId(invoice.getInvoice().getOwnerId())
                         .shopId(invoice.getInvoice().getShopId())
                         .build();
-                long amount = invoices.get(invoiceId);
+                long amount = registryOperations.get(invoiceId);
                 payouts.merge(partyShop, amount, Long::sum);
             } catch (TException e) {
                 log.error("Received error when get invoice ", e);

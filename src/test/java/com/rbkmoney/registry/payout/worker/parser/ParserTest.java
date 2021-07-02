@@ -24,7 +24,7 @@ public class ParserTest {
         InputStream inputStream = new FileInputStream(file);
         Map<String, Long> registryOperations = rsbParser.parse(inputStream);
         assertEquals(6, registryOperations.size());
-        assertEquals(-500, registryOperations.get("-1"));
+        assertEquals(-500, registryOperations.get("8"));
         assertEquals(1100, registryOperations.get("0"));
         assertEquals(1500, registryOperations.get("1"));
         assertEquals(1700, registryOperations.get("2"));

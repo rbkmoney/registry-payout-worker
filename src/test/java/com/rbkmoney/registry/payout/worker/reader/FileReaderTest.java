@@ -57,8 +57,8 @@ public class FileReaderTest extends MockTransactions {
                 PayoutStorage payoutStorage = filereader().readFiles(ftpClient, "rsb");
                 assertEquals(6, payoutStorage.getPayouts().size());
                 assertEquals(-500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
-                        .partyId("testPartyId-1")
-                        .shopId("testShopId-1")
+                        .partyId("testPartyId5")
+                        .shopId("testShopId6")
                         .build()));
                 assertEquals(1100, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
                         .partyId("testPartyId0")

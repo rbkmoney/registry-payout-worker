@@ -37,30 +37,29 @@ public class MockTransactions {
     }
 
 
-    public Map<String, Long> mockOperations() throws TException, IOException {
+    public Map<String, Long> ctreateOperations() throws IOException {
         File file = new File("src/test/resources/test.xls");
         InputStream inputStream = new FileInputStream(file);
         Map<String, Long> registryOperations = rsbParser.parse(inputStream);
-        mockPayment(registryOperations);
         return registryOperations;
     }
 
-    private void mockPayment(Map<String, Long> map) throws TException, IOException {
-        for (String key : map.keySet()) {
-            if (Integer.parseInt(key) < 3) {
-                when(invoicingClient.get(InvoicingHgClientService.USER_INFO, key,
+    private void mockOperations() throws TException, IOException {
+        for (int i = 0; i <= 8; i++) {
+            if (i < 3) {
+                when(invoicingClient.get(InvoicingHgClientService.USER_INFO, String.valueOf(i),
                         InvoicingHgClientService.EVENT_RANGE))
                         .thenReturn(new Invoice().setInvoice(buildInvoice(
-                                "testPartyId" + Integer.parseInt(key),
-                                "testShopId" + Integer.parseInt(key),
-                                key)));
+                                "testPartyId" + i,
+                                "testShopId" + i,
+                                String.valueOf(i))));
             } else {
-                when(invoicingClient.get(InvoicingHgClientService.USER_INFO, key,
+                when(invoicingClient.get(InvoicingHgClientService.USER_INFO, String.valueOf(i),
                         InvoicingHgClientService.EVENT_RANGE))
                         .thenReturn(new Invoice().setInvoice(buildInvoice(
-                                "testPartyId" + (Integer.parseInt(key) - 3),
-                                "testShopId" + (Integer.parseInt(key) - 2),
-                                key)));
+                                "testPartyId" + (i - 3),
+                                "testShopId" + (i - 2),
+                                String.valueOf(i))));
             }
         }
 
