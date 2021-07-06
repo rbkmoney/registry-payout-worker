@@ -6,6 +6,7 @@ import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
+import com.rbkmoney.registry.payout.worker.model.TransactionsStorage;
 import com.rbkmoney.registry.payout.worker.parser.RsbParser;
 import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import org.apache.thrift.TException;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.*;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -37,11 +37,11 @@ public class MockTransactions {
     }
 
 
-    public Map<String, Long> ctreateOperations() throws IOException {
+    public TransactionsStorage ctreateOperations() throws IOException {
         File file = new File("src/test/resources/test.xls");
         InputStream inputStream = new FileInputStream(file);
-        Map<String, Long> registryOperations = rsbParser.parse(inputStream);
-        return registryOperations;
+        TransactionsStorage transactionsStorage = rsbParser.parse(inputStream);
+        return transactionsStorage;
     }
 
     private void mockOperations() throws TException, IOException {

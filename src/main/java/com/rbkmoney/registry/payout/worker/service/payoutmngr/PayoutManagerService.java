@@ -2,10 +2,9 @@ package com.rbkmoney.registry.payout.worker.service.payoutmngr;
 
 import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.CurrencyRef;
-import com.rbkmoney.damsel.payment_processing.PartyManagementSrv;
 import com.rbkmoney.payout.manager.*;
+import com.rbkmoney.registry.payout.worker.model.PartyShop;
 import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
-import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
@@ -20,9 +19,8 @@ import java.util.List;
 public class PayoutManagerService {
 
     private final PayoutManagementSrv.Iface payoutManagerClient;
-    private final PartyManagementSrv.Iface partyManagementClient;
 
-    public void sendPayouts(PayoutStorage payoutStorage) throws TException {
+    public void sendPayouts(PayoutStorage payoutStorage) {
         createPayouts(payoutStorage).forEach((PayoutParams payoutParams) -> {
             try {
                 payoutManagerClient.createPayout(payoutParams);
@@ -33,20 +31,14 @@ public class PayoutManagerService {
         });
     }
 
-    public List<PayoutParams> createPayouts(PayoutStorage payoutStorage) throws TException {
+    public List<PayoutParams> createPayouts(PayoutStorage payoutStorage) {
         List<PayoutParams> listPayoutParams = new ArrayList<>();
-        for (PayoutStorage.PartyShop partyShop : payoutStorage.getPayouts().keySet()) {
-            Long amount = payoutStorage.getPayouts().get(partyShop);
+        for (PartyShop partyShop : payoutStorage.getPayouts().keySet()) {
+            Long amount = payoutStorage.getPayouts().get(partyShop).getAmount();
             if (amount > 0) {
                 Cash cash = new Cash();
                 cash.setAmount(amount);
-                CurrencyRef currencyRef = partyManagementClient
-                        .getShopAccount(
-                                InvoicingHgClientService.USER_INFO,
-                                partyShop.getPartyId(),
-                                partyShop.getShopId())
-                        .getCurrency();
-                cash.setCurrency(currencyRef);
+                cash.setCurrency(new CurrencyRef(payoutStorage.getPayouts().get(partyShop).getCurrency()));
                 ShopParams shopParams = new ShopParams();
                 shopParams.setPartyId(partyShop.getPartyId());
                 shopParams.setShopId(partyShop.getShopId());

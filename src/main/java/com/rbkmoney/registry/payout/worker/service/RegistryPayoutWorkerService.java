@@ -29,7 +29,7 @@ public class RegistryPayoutWorkerService {
             ftpClient.changeWorkingDirectory(ftpProperties.getParentPath());
             FTPFile[] ftpDirs = ftpClient.listDirectories();
             for (FTPFile ftpDir : ftpDirs) {
-                if (ftpDir.getName().equals(".") || ftpDir.getName().equals("..")) {
+                if (directoryToSkip(ftpDir.getName())) {
                     continue;
                 }
                 ftpClient.changeWorkingDirectory(ftpDir.getName());
@@ -62,6 +62,10 @@ public class RegistryPayoutWorkerService {
         } catch (IOException ex) {
             log.error("Received error while close FTP client: ", ex);
         }
+    }
+
+    private boolean directoryToSkip(String dirName) {
+        return dirName.equals(".") || dirName.equals("..");
     }
 
 }

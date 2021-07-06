@@ -1,5 +1,7 @@
 package com.rbkmoney.registry.payout.worker.parser;
 
+import com.rbkmoney.registry.payout.worker.model.Transaction;
+import com.rbkmoney.registry.payout.worker.model.TransactionsStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -17,8 +19,9 @@ public class RsbParser {
 
     private static final String NUMERIC_PATTERN = "-?\\d+(,\\d+)?";
 
-    public Map<String, Long> parse(InputStream inputStream) {
-        Map<String, Long> registryOperations = new HashMap<>();
+    public TransactionsStorage parse(InputStream inputStream) {
+        List<Transaction> payments = new ArrayList<>();
+        List<Transaction> refunds = new ArrayList<>();
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIter = sheet.rowIterator();
@@ -27,15 +30,25 @@ public class RsbParser {
                 String merchTrxId = row.getCell(10).getStringCellValue();
                 String paymentAmount = row.getCell(4).getStringCellValue();
                 if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
-                    long amount = Long.parseLong(paymentAmount.replace(",", ""));
-                    String invoiceId = merchTrxId.substring(0, merchTrxId.indexOf("."));
-                    registryOperations.merge(invoiceId, amount, Long::sum);
+                    Transaction transaction = Transaction.builder()
+                            .id(merchTrxId.substring(0, merchTrxId.indexOf(".")))
+                            .amount(getAmount(paymentAmount))
+                            .currency(row.getCell(6).getStringCellValue())
+                            .build();
+                    if (transaction.getAmount() > 0) {
+                        payments.add(transaction);
+                    } else {
+                        refunds.add(transaction);
+                    }
                 }
             }
         } catch (EmptyFileException | InvalidFormatException | IOException ex) {
             log.error("Failed parse registry.", ex);
         }
-        return registryOperations;
+        return TransactionsStorage.builder()
+                .payments(payments)
+                .refunds(refunds)
+                .build();
     }
 
     private boolean isNumeric(String strNum) {
@@ -44,6 +57,10 @@ public class RsbParser {
             return false;
         }
         return pattern.matcher(strNum).matches();
+    }
+
+    private Long getAmount(String paymentAmount) {
+        return (long) Double.parseDouble(paymentAmount.replace(",", ".")) * 100;
     }
 
 }

@@ -2,7 +2,7 @@ package com.rbkmoney.registry.payout.worker.reader;
 
 import com.rbkmoney.registry.payout.worker.handler.RegistryPayoutHandler;
 import com.rbkmoney.registry.payout.worker.handler.SkipRegistryPayoutPayoutHandler;
-import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
+import com.rbkmoney.registry.payout.worker.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
+
+import static com.rbkmoney.registry.payout.worker.mapper.PayoutMapper.mapTransactionToPayout;
 
 @Slf4j
 @Component
@@ -30,12 +33,12 @@ public class FilePayoutStorageReader {
                 if (ftpClient.completePendingCommand()) {
                     log.info("File {} was received successfully.", ftpFile.getName());
                 }
-                PayoutStorage filePayoutStorage = handlers.stream()
+                Map<PartyShop, List<Transaction>> transactions = handlers.stream()
                         .filter(handler -> handler.isHadle(pathDir))
                         .findFirst()
                         .orElse(new SkipRegistryPayoutPayoutHandler())
-                        .handle(inputStream, payoutStorage);
-                payoutStorage.getPayouts().putAll(filePayoutStorage.getPayouts());
+                        .handle(inputStream);
+                payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
                 inputStream.close();
                 ftpClient.makeDirectory(PATH_TO_PROCESSED_FILE);
                 ftpClient.rename(ftpClient.printWorkingDirectory() + "/" + ftpFile.getName(),

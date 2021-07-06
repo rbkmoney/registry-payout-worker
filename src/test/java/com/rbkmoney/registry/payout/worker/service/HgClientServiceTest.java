@@ -1,14 +1,16 @@
 package com.rbkmoney.registry.payout.worker.service;
 
 import com.rbkmoney.registry.payout.worker.RegistryPayoutWorkerApplication;
-import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
+import com.rbkmoney.registry.payout.worker.model.PartyShop;
+import com.rbkmoney.registry.payout.worker.model.Transaction;
 import com.rbkmoney.registry.payout.worker.service.hg.InvoicingHgClientService;
-import org.apache.thrift.TException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -20,35 +22,35 @@ public class HgClientServiceTest extends MockTransactions {
     private InvoicingHgClientService hgClientService;
 
     @Test
-    void testHgClientService() throws TException, IOException {
-        PayoutStorage payoutStorage = hgClientService.getPayouts(ctreateOperations(),
-                new PayoutStorage());
-        assertEquals(6, payoutStorage.getPayouts().size());
-        assertEquals(-500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+    void testHgClientService() throws IOException {
+        Map<PartyShop, List<Transaction>> payoutStorage =
+                hgClientService.groupTransactionsByPartyShop(ctreateOperations());
+        assertEquals(6, payoutStorage.size());
+        assertEquals(2, payoutStorage.get(PartyShop.builder()
                 .partyId("testPartyId5")
                 .shopId("testShopId6")
-                .build()));
-        assertEquals(1100, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .build()).size());
+        assertEquals(4, payoutStorage.get(PartyShop.builder()
                 .partyId("testPartyId0")
                 .shopId("testShopId0")
-                .build()));
-        assertEquals(1700, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .build()).size());
+        assertEquals(4, payoutStorage.get(PartyShop.builder()
                 .partyId("testPartyId0")
                 .shopId("testShopId1")
-                .build()));
-        assertEquals(1500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .build()).size());
+        assertEquals(4, payoutStorage.get(PartyShop.builder()
                 .partyId("testPartyId1")
                 .shopId("testShopId1")
-                .build()));
-        assertEquals(2200, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .build()).size());
+        assertEquals(2, payoutStorage.get(PartyShop.builder()
                 .partyId("testPartyId1")
                 .shopId("testShopId2")
-                .build()));
-        assertEquals(1700, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .build()).size());
+        assertEquals(3, payoutStorage.get(PartyShop.builder()
                 .partyId("testPartyId2")
                 .shopId("testShopId2")
-                .build()));
-        assertNull(payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                .build()).size());
+        assertNull(payoutStorage.get(PartyShop.builder()
                 .partyId("testPartyId0")
                 .shopId("testShopId2")
                 .build()));

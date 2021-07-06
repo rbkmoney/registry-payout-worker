@@ -1,11 +1,13 @@
 package com.rbkmoney.registry.payout.worker.handler;
 
-import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
+import com.rbkmoney.registry.payout.worker.model.PartyShop;
+import com.rbkmoney.registry.payout.worker.model.Transaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -18,8 +20,8 @@ public class SkipRegistryPayoutPayoutHandler implements RegistryPayoutHandler {
     }
 
     @Override
-    public PayoutStorage handle(InputStream inputStream, PayoutStorage payoutStorage) {
+    public Map<PartyShop, List<Transaction>> handle(InputStream inputStream) {
         log.error("No handlers available to get payouts.");
-        return new PayoutStorage();
+        return new HashMap<>();
     }
 }

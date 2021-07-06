@@ -5,6 +5,7 @@ import com.rbkmoney.registry.payout.worker.ftp.TestFtpClient;
 import com.rbkmoney.registry.payout.worker.ftp.TestFtpServer;
 import com.rbkmoney.registry.payout.worker.handler.RegistryPayoutHandler;
 import com.rbkmoney.registry.payout.worker.handler.RsbRegistryPayoutPayoutHandler;
+import com.rbkmoney.registry.payout.worker.model.PartyShop;
 import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
 import com.rbkmoney.registry.payout.worker.parser.RsbParser;
 import com.rbkmoney.registry.payout.worker.service.MockTransactions;
@@ -56,31 +57,37 @@ public class FileReaderTest extends MockTransactions {
                 ftpClient.changeWorkingDirectory(ftpDir.getName());
                 PayoutStorage payoutStorage = filereader().readFiles(ftpClient, "rsb");
                 assertEquals(6, payoutStorage.getPayouts().size());
-                assertEquals(-500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                assertEquals(-500, payoutStorage.getPayouts().get(PartyShop.builder()
                         .partyId("testPartyId5")
                         .shopId("testShopId6")
-                        .build()));
-                assertEquals(1100, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                        .build())
+                        .getAmount());
+                assertEquals(1100, payoutStorage.getPayouts().get(PartyShop.builder()
                         .partyId("testPartyId0")
                         .shopId("testShopId0")
-                        .build()));
-                assertEquals(1700, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                        .build())
+                        .getAmount());
+                assertEquals(1700, payoutStorage.getPayouts().get(PartyShop.builder()
                         .partyId("testPartyId0")
                         .shopId("testShopId1")
-                        .build()));
-                assertEquals(1500, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                        .build())
+                        .getAmount());
+                assertEquals(1500, payoutStorage.getPayouts().get(PartyShop.builder()
                         .partyId("testPartyId1")
                         .shopId("testShopId1")
-                        .build()));
-                assertEquals(2200, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                        .build())
+                        .getAmount());
+                assertEquals(2200, payoutStorage.getPayouts().get(PartyShop.builder()
                         .partyId("testPartyId1")
                         .shopId("testShopId2")
-                        .build()));
-                assertEquals(1700, payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                        .build())
+                        .getAmount());
+                assertEquals(1700, payoutStorage.getPayouts().get(PartyShop.builder()
                         .partyId("testPartyId2")
                         .shopId("testShopId2")
-                        .build()));
-                assertNull(payoutStorage.getPayouts().get(PayoutStorage.PartyShop.builder()
+                        .build())
+                        .getAmount());
+                assertNull(payoutStorage.getPayouts().get(PartyShop.builder()
                         .partyId("testPartyId0")
                         .shopId("testShopId2")
                         .build()));
