@@ -31,13 +31,4 @@ public class ServiceConfiguration {
                 .withNetworkTimeout(networkTimeout)
                 .withAddress(resource.getURI()).build(PayoutManagementSrv.Iface.class);
     }
-
-    @Bean
-    public PartyManagementSrv.Iface partyManagementClient(
-            @Value("${service.partymgmt.url}") Resource resource,
-            @Value("${service.partymgmt.networkTimeout}") int networkTimeout) throws IOException {
-        return new THSpawnClientBuilder()
-                .withNetworkTimeout(networkTimeout)
-                .withAddress(resource.getURI()).build(PartyManagementSrv.Iface.class);
-    }
 }

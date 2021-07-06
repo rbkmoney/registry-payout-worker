@@ -1,8 +1,7 @@
 package com.rbkmoney.registry.payout.worker.service;
 
-import com.rbkmoney.damsel.domain.CurrencyRef;
-import com.rbkmoney.damsel.domain.ShopAccount;
-import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.damsel.payment_processing.Invoice;
+import com.rbkmoney.damsel.payment_processing.InvoicingSrv;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
 import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
@@ -16,7 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.*;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class MockTransactions {
@@ -24,16 +22,12 @@ public class MockTransactions {
     @MockBean
     private InvoicingSrv.Iface invoicingClient;
 
-    @MockBean
-    private PartyManagementSrv.Iface partyManagementClient;
-
     @Autowired
     private RsbParser rsbParser;
 
     @BeforeEach
     public void init() throws TException, IOException {
         mockOperations();
-        mockPartyManagement();
     }
 
 
@@ -78,9 +72,4 @@ public class MockTransactions {
                 .setOwnerId(partyId);
     }
 
-    private void mockPartyManagement() throws TException {
-        when(partyManagementClient.getShopAccount(any(), any(), any()))
-                .thenReturn(new ShopAccount().setCurrency(new CurrencyRef("RUB")));
-
-    }
 }

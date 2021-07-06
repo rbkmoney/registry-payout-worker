@@ -53,6 +53,3 @@ service:
   payoutmgmt:
     url: http://payout-manager:8022/payout/management
     networkTimeout: 5000
-  partymgmt:
-    url: http://hellgate:8022/v1/processing/partymgmt
-    networkTimeout: 5000
