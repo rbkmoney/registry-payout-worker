@@ -31,7 +31,7 @@ public class RsbParser {
                 String paymentAmount = row.getCell(4).getStringCellValue();
                 if (!merchTrxId.isEmpty() && isNumeric(paymentAmount)) {
                     Transaction transaction = Transaction.builder()
-                            .id(merchTrxId.substring(0, merchTrxId.indexOf(".")))
+                            .id(getInvoiceId(merchTrxId))
                             .amount(getAmount(paymentAmount))
                             .currency(row.getCell(6).getStringCellValue())
                             .build();
@@ -61,6 +61,10 @@ public class RsbParser {
 
     private Long getAmount(String paymentAmount) {
         return (long) Double.parseDouble(paymentAmount.replace(",", ".")) * 100;
+    }
+
+    private String getInvoiceId(String merchTrxId) {
+        return merchTrxId.substring(0, merchTrxId.indexOf("."));
     }
 
 }
