@@ -7,6 +7,7 @@ import com.rbkmoney.registry.payout.worker.service.payoutmngr.PayoutManagerServi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "scheduling.enabled", havingValue = "true")
 public class RegistryPayoutWorkerService {
 
     private final FtpProperties ftpProperties;

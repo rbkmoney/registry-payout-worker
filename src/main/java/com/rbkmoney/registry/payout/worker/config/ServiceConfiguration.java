@@ -1,7 +1,6 @@
 package com.rbkmoney.registry.payout.worker.config;
 
 import com.rbkmoney.damsel.payment_processing.InvoicingSrv;
-import com.rbkmoney.damsel.payment_processing.PartyManagementSrv;
 import com.rbkmoney.payout.manager.PayoutManagementSrv;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import org.springframework.beans.factory.annotation.Value;

@@ -45,6 +45,7 @@ ftp:
 scheduling:
   fixed:
     rate: 900000
+  enabled: false
 
 service:
   invoicing:
