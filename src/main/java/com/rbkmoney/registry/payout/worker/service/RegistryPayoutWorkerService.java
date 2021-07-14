@@ -46,14 +46,15 @@ public class RegistryPayoutWorkerService {
     }
 
     public SSHClient sshClient() throws IOException {
-        SSHClient sshClient = new SSHClient();
-        sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-        sshClient.setConnectTimeout(ftpProperties.getConnectTimeout());
-        sshClient.connect(ftpProperties.getHost(), ftpProperties.getPort());
-        KeyProvider keyProvider = sshClient.loadKeys(ftpProperties.getPrivateKeyPath(),
-                ftpProperties.getPrivateKeyPassphrase());
-        sshClient.authPublickey(ftpProperties.getUsername(), keyProvider);
-        return sshClient;
+        try (SSHClient sshClient = new SSHClient()) {
+            sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+            sshClient.setConnectTimeout(ftpProperties.getConnectTimeout());
+            sshClient.connect(ftpProperties.getHost(), ftpProperties.getPort());
+            KeyProvider keyProvider = sshClient.loadKeys(ftpProperties.getPrivateKeyPath(),
+                    ftpProperties.getPrivateKeyPassphrase());
+            sshClient.authPublickey(ftpProperties.getUsername(), keyProvider);
+            return sshClient;
+        }
     }
 
     private boolean directoryToSkip(String dirName) {
