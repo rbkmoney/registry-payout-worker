@@ -29,7 +29,7 @@ public class FilePayoutStorageReader {
         for (RemoteResourceInfo remoteResourceInfo : remoteResourceInfoList) {
             if (remoteResourceInfo.isRegularFile()) {
                 try (RemoteFile remoteFile = sftpClient.open(remoteResourceInfo.getPath());
-                     InputStream inputStream = remoteFile.new RemoteFileInputStream(0)) {
+                        InputStream inputStream = remoteFile.new RemoteFileInputStream(0)) {
                     log.info("File {} was received successfully", remoteResourceInfo.getName());
                     Map<PartyShop, List<Transaction>> transactions = handlers.stream()
                             .filter(handler -> handler.isHadle(ftpDir.getName()))

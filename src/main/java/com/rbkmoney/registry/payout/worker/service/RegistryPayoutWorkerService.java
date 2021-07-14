@@ -31,7 +31,7 @@ public class RegistryPayoutWorkerService {
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
     public void readTransactionsFromRegistries() {
         try (SSHClient sshClient = sshClient();
-             SFTPClient sftpClient = sshClient.newSFTPClient()) {
+                SFTPClient sftpClient = sshClient.newSFTPClient()) {
             List<RemoteResourceInfo> ftpDirs = sftpClient.ls(ftpProperties.getParentPath());
             for (RemoteResourceInfo ftpDir : ftpDirs) {
                 if (directoryToSkip(ftpDir.getName())) {
