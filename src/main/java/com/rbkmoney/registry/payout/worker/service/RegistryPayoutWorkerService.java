@@ -15,7 +15,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -30,22 +29,6 @@ public class RegistryPayoutWorkerService {
 
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
     public void readTransactionsFromRegistries() {
-        try (SSHClient sshClient = sshClient();
-                SFTPClient sftpClient = sshClient.newSFTPClient()) {
-            List<RemoteResourceInfo> ftpDirs = sftpClient.ls(ftpProperties.getParentPath());
-            for (RemoteResourceInfo ftpDir : ftpDirs) {
-                if (directoryToSkip(ftpDir.getName())) {
-                    continue;
-                }
-                PayoutStorage payoutStorage = filePayoutStorageReader.readFiles(sftpClient, ftpDir);
-                payoutManagerService.sendPayouts(payoutStorage);
-            }
-        } catch (Exception ex) {
-            log.error("Received error while connect to Ftp client:", ex);
-        }
-    }
-
-    public SSHClient sshClient() throws IOException {
         try (SSHClient sshClient = new SSHClient()) {
             sshClient.addHostKeyVerifier(new PromiscuousVerifier());
             sshClient.setConnectTimeout(ftpProperties.getConnectTimeout());
@@ -53,7 +36,18 @@ public class RegistryPayoutWorkerService {
             KeyProvider keyProvider = sshClient.loadKeys(ftpProperties.getPrivateKeyPath(),
                     ftpProperties.getPrivateKeyPassphrase());
             sshClient.authPublickey(ftpProperties.getUsername(), keyProvider);
-            return sshClient;
+            try (SFTPClient sftpClient = sshClient.newSFTPClient()) {
+                List<RemoteResourceInfo> ftpDirs = sftpClient.ls(ftpProperties.getParentPath());
+                for (RemoteResourceInfo ftpDir : ftpDirs) {
+                    if (directoryToSkip(ftpDir.getName())) {
+                        continue;
+                    }
+                    PayoutStorage payoutStorage = filePayoutStorageReader.readFiles(sftpClient, ftpDir);
+                    payoutManagerService.sendPayouts(payoutStorage);
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Received error while connect to Ftp client:", ex);
         }
     }
 

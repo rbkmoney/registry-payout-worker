@@ -21,28 +21,28 @@ import static com.rbkmoney.registry.payout.worker.mapper.PayoutMapper.mapTransac
 public class FilePayoutStorageReader {
 
     private final List<RegistryPayoutHandler> handlers;
-    private static final String PROCESSED_PATH = "/processed/";
+    private static final String PROCESSED_PATH = "processed";
 
     public PayoutStorage readFiles(SFTPClient sftpClient, RemoteResourceInfo ftpDir) throws IOException {
         PayoutStorage payoutStorage = new PayoutStorage();
-        List<RemoteResourceInfo> remoteResourceInfoList = sftpClient.ls(ftpDir.getPath());
-        for (RemoteResourceInfo remoteResourceInfo : remoteResourceInfoList) {
-            if (remoteResourceInfo.isRegularFile()) {
-                try (RemoteFile remoteFile = sftpClient.open(remoteResourceInfo.getPath());
+        List<RemoteResourceInfo> resourceInfoList = sftpClient.ls(ftpDir.getPath());
+        for (RemoteResourceInfo resourceInfo : resourceInfoList) {
+            if (resourceInfo.isRegularFile()) {
+                try (RemoteFile remoteFile = sftpClient.open(resourceInfo.getPath());
                         InputStream inputStream = remoteFile.new RemoteFileInputStream(0)) {
-                    log.info("File {} was received successfully", remoteResourceInfo.getName());
+                    log.info("File {} was received successfully", resourceInfo.getName());
                     Map<PartyShop, List<Transaction>> transactions = handlers.stream()
                             .filter(handler -> handler.isHadle(ftpDir.getName()))
                             .findFirst()
                             .orElse(new SkipRegistryPayoutPayoutHandler())
                             .handle(inputStream);
                     payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
+                    if (processedPathNotExist(resourceInfoList)) {
+                        sftpClient.mkdir(resourceInfo.getParent() + "/" + PROCESSED_PATH);
+                    }
+                    sftpClient.rename(resourceInfo.getPath(),
+                            resourceInfo.getParent() + "/" + PROCESSED_PATH + "/" + resourceInfo.getName());
                 }
-                if (processedPathNotExist(remoteResourceInfoList)) {
-                    sftpClient.mkdir(remoteResourceInfo.getParent() + PROCESSED_PATH);
-                }
-                sftpClient.rename(remoteResourceInfo.getPath(),
-                        remoteResourceInfo.getParent() + PROCESSED_PATH + remoteResourceInfo.getName());
             }
         }
         return payoutStorage;
