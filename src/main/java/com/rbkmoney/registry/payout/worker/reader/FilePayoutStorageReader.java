@@ -5,8 +5,7 @@ import com.rbkmoney.registry.payout.worker.handler.SkipRegistryPayoutPayoutHandl
 import com.rbkmoney.registry.payout.worker.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
+import net.schmizz.sshj.sftp.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,30 +21,35 @@ import static com.rbkmoney.registry.payout.worker.mapper.PayoutMapper.mapTransac
 public class FilePayoutStorageReader {
 
     private final List<RegistryPayoutHandler> handlers;
-    private static final String PATH_TO_PROCESSED_FILE = "processed";
+    private static final String PROCESSED_PATH = "/processed/";
 
-    public PayoutStorage readFiles(FTPClient ftpClient, String pathDir) throws IOException {
+    public PayoutStorage readFiles(SFTPClient sftpClient, RemoteResourceInfo ftpDir) throws IOException {
         PayoutStorage payoutStorage = new PayoutStorage();
-        FTPFile[] ftpFiles = ftpClient.listFiles();
-        for (FTPFile ftpFile : ftpFiles) {
-            if (ftpFile.isFile()) {
-                InputStream inputStream = ftpClient.retrieveFileStream(ftpFile.getName());
-                if (ftpClient.completePendingCommand()) {
-                    log.info("File {} was received successfully.", ftpFile.getName());
-                }
+        List<RemoteResourceInfo> remoteResourceInfoList = sftpClient.ls(ftpDir.getPath());
+        for (RemoteResourceInfo remoteResourceInfo : remoteResourceInfoList) {
+            if (remoteResourceInfo.isRegularFile()) {
+                RemoteFile remoteFile = sftpClient.open(remoteResourceInfo.getPath());
+                InputStream inputStream = remoteFile.new RemoteFileInputStream(0);
+                log.info("File {} was received successfully", remoteResourceInfo.getName());
                 Map<PartyShop, List<Transaction>> transactions = handlers.stream()
-                        .filter(handler -> handler.isHadle(pathDir))
+                        .filter(handler -> handler.isHadle(ftpDir.getName()))
                         .findFirst()
                         .orElse(new SkipRegistryPayoutPayoutHandler())
                         .handle(inputStream);
                 payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
                 inputStream.close();
-                ftpClient.makeDirectory(PATH_TO_PROCESSED_FILE);
-                ftpClient.rename(ftpClient.printWorkingDirectory() + "/" + ftpFile.getName(),
-                        ftpClient.printWorkingDirectory() + "/" + PATH_TO_PROCESSED_FILE + "/" + ftpFile.getName());
+                if (processedPathNotExist(remoteResourceInfoList)) {
+                    sftpClient.mkdir(remoteResourceInfo.getParent() + PROCESSED_PATH);
+                }
+                sftpClient.rename(remoteResourceInfo.getPath(),
+                        remoteResourceInfo.getParent() + PROCESSED_PATH + remoteResourceInfo.getName());
             }
         }
         return payoutStorage;
+    }
+
+    private boolean processedPathNotExist(final List<RemoteResourceInfo> list) {
+        return list.stream().noneMatch(o -> o.getName().equals(PROCESSED_PATH));
     }
 
 }

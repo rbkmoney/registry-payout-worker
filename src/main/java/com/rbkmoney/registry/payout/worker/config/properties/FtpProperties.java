@@ -6,11 +6,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "ftp")
+@ConfigurationProperties(prefix = "sftp")
 public class FtpProperties {
     private String host;
     private int port;
+    private int connectTimeout;
     private String username;
-    private String password;
+    private String privateKeyPath;
+    private String privateKeyPassphrase;
     private String parentPath;
 }

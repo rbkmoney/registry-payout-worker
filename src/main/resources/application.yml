@@ -35,17 +35,19 @@ info:
   version: '@project.version@'
   stage: dev
 
-ftp:
-  host: localhost
-  port: 21
+sftp:
+  host: srvsftp1.adds.rbkmoney.com
+  port: 22
+  connectTimeout: 10000
   username: test
-  password: test
-  parentPath: registry
+  privateKeyPath: keys/sftp.key
+  privateKeyPassphrase: test
+  parentPath: /home/registry
 
 scheduling:
   fixed:
     rate: 900000
-  enabled: false
+  enabled: true
 
 service:
   invoicing:
