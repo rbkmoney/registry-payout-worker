@@ -30,10 +30,8 @@ public class RegistryPayoutWorkerService {
 
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
     public void readTransactionsFromRegistries() {
-        SSHClient sshClient = new SSHClient();
-        try {
-            sshClient = sshClient();
-            SFTPClient sftpClient = sshClient.newSFTPClient();
+        try (SSHClient sshClient = sshClient();
+             SFTPClient sftpClient = sshClient.newSFTPClient()) {
             List<RemoteResourceInfo> ftpDirs = sftpClient.ls(ftpProperties.getParentPath());
             for (RemoteResourceInfo ftpDir : ftpDirs) {
                 if (directoryToSkip(ftpDir.getName())) {
@@ -44,8 +42,6 @@ public class RegistryPayoutWorkerService {
             }
         } catch (Exception ex) {
             log.error("Received error while connect to Ftp client:", ex);
-        } finally {
-            closeFtp(sshClient);
         }
     }
 
@@ -58,17 +54,6 @@ public class RegistryPayoutWorkerService {
                 ftpProperties.getPrivateKeyPassphrase());
         sshClient.authPublickey(ftpProperties.getUsername(), keyProvider);
         return sshClient;
-    }
-
-    private void closeFtp(SSHClient sshClient) {
-        try {
-            if (sshClient != null && sshClient.isConnected()) {
-                sshClient.disconnect();
-                sshClient.close();
-            }
-        } catch (IOException ex) {
-            log.error("Received error while close FTP client: ", ex);
-        }
     }
 
     private boolean directoryToSkip(String dirName) {

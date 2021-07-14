@@ -28,16 +28,16 @@ public class FilePayoutStorageReader {
         List<RemoteResourceInfo> remoteResourceInfoList = sftpClient.ls(ftpDir.getPath());
         for (RemoteResourceInfo remoteResourceInfo : remoteResourceInfoList) {
             if (remoteResourceInfo.isRegularFile()) {
-                RemoteFile remoteFile = sftpClient.open(remoteResourceInfo.getPath());
-                InputStream inputStream = remoteFile.new RemoteFileInputStream(0);
-                log.info("File {} was received successfully", remoteResourceInfo.getName());
-                Map<PartyShop, List<Transaction>> transactions = handlers.stream()
-                        .filter(handler -> handler.isHadle(ftpDir.getName()))
-                        .findFirst()
-                        .orElse(new SkipRegistryPayoutPayoutHandler())
-                        .handle(inputStream);
-                payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
-                inputStream.close();
+                try (RemoteFile remoteFile = sftpClient.open(remoteResourceInfo.getPath());
+                     InputStream inputStream = remoteFile.new RemoteFileInputStream(0)) {
+                    log.info("File {} was received successfully", remoteResourceInfo.getName());
+                    Map<PartyShop, List<Transaction>> transactions = handlers.stream()
+                            .filter(handler -> handler.isHadle(ftpDir.getName()))
+                            .findFirst()
+                            .orElse(new SkipRegistryPayoutPayoutHandler())
+                            .handle(inputStream);
+                    payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
+                }
                 if (processedPathNotExist(remoteResourceInfoList)) {
                     sftpClient.mkdir(remoteResourceInfo.getParent() + PROCESSED_PATH);
                 }
