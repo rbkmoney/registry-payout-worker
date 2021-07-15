@@ -57,7 +57,7 @@ public class FilePayoutStorageReader {
             sftpClient.mkdir(resourceInfo.getParent() + "/" + PROCESSED_PATH);
         }
         sftpClient.rename(resourceInfo.getPath(),
-                resourceInfo.getParent() + "/" + PROCESSED_PATH + "/" + resourceInfo.getName());
+                String.join("/", resourceInfo.getParent(), PROCESSED_PATH, resourceInfo.getName()));
     }
 
     private boolean isProcessedPathNotExist(final List<RemoteResourceInfo> list) {
