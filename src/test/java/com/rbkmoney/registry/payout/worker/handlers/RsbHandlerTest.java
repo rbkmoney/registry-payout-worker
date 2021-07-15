@@ -24,7 +24,7 @@ public class RsbHandlerTest extends MockTransactions {
     private RsbRegistryPayoutPayoutHandler rsbRegistryPayoutPayoutHandler;
 
     @Test
-    void testRsbHandler() throws IOException {
+    void testPayoutStorageFromRegistryFile() throws IOException {
         File file = new File(TEST_FILE_NAME);
         PayoutStorage payoutStorage = new PayoutStorage();
         Map<PartyShop, List<Transaction>> transactions =
