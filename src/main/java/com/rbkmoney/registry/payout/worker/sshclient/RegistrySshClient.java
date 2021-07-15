@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @Component
-public class RegistrySSHClient {
+public class RegistrySshClient {
 
     private final FtpProperties ftpProperties;
 

@@ -4,7 +4,7 @@ import com.rbkmoney.registry.payout.worker.config.properties.FtpProperties;
 import com.rbkmoney.registry.payout.worker.model.PayoutStorage;
 import com.rbkmoney.registry.payout.worker.reader.FilePayoutStorageReader;
 import com.rbkmoney.registry.payout.worker.service.payoutmngr.PayoutManagerService;
-import com.rbkmoney.registry.payout.worker.sshclient.RegistrySSHClient;
+import com.rbkmoney.registry.payout.worker.sshclient.RegistrySshClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
@@ -24,7 +24,7 @@ public class RegistryPayoutWorkerService {
     private final FtpProperties ftpProperties;
     private final FilePayoutStorageReader filePayoutStorageReader;
     private final PayoutManagerService payoutManagerService;
-    private final RegistrySSHClient sshClient;
+    private final RegistrySshClient sshClient;
 
     @Scheduled(fixedRateString = "${scheduling.fixed.rate}")
     public void readTransactionsFromRegistries() {
