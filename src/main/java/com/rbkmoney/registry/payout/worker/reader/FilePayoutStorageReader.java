@@ -30,7 +30,7 @@ public class FilePayoutStorageReader {
             if (resourceInfo.isRegularFile()) {
                 Map<PartyShop, List<Transaction>> transactions = readFile(sftpClient, resourceInfo, ftpDir.getName());
                 payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
-                movingFileToProcessedPath(resourceInfoList, resourceInfo, sftpClient);
+                moveFileToProcessedPath(resourceInfoList, resourceInfo, sftpClient);
             }
         }
         return payoutStorage;
@@ -50,9 +50,9 @@ public class FilePayoutStorageReader {
         }
     }
 
-    private void movingFileToProcessedPath(List<RemoteResourceInfo> resourceInfoList,
-                                           RemoteResourceInfo resourceInfo,
-                                           SFTPClient sftpClient) throws IOException {
+    private void moveFileToProcessedPath(List<RemoteResourceInfo> resourceInfoList,
+                                         RemoteResourceInfo resourceInfo,
+                                         SFTPClient sftpClient) throws IOException {
         if (isProcessedPathNotExist(resourceInfoList)) {
             sftpClient.mkdir(resourceInfo.getParent() + "/" + PROCESSED_PATH);
         }
