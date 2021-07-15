@@ -35,7 +35,7 @@ public class RegistryPayoutWorkerService {
             try (SFTPClient sftpClient = sshClient.newSFTPClient()) {
                 List<RemoteResourceInfo> ftpDirs = sftpClient.ls(ftpProperties.getParentPath());
                 for (RemoteResourceInfo ftpDir : ftpDirs) {
-                    if (isDirectoryToSkip(ftpDir.getName())) {
+                    if (isDirectoryToSkip(ftpDir.getName()) || !ftpDir.isDirectory()) {
                         continue;
                     }
                     PayoutStorage payoutStorage = filePayoutStorageReader.readFiles(sftpClient, ftpDir);
