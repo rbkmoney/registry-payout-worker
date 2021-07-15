@@ -28,27 +28,34 @@ public class FilePayoutStorageReader {
         List<RemoteResourceInfo> resourceInfoList = sftpClient.ls(ftpDir.getPath());
         for (RemoteResourceInfo resourceInfo : resourceInfoList) {
             if (resourceInfo.isRegularFile()) {
-                try (RemoteFile remoteFile = sftpClient.open(resourceInfo.getPath());
-                        InputStream inputStream = remoteFile.new RemoteFileInputStream(0)) {
-                    log.info("File {} was received successfully", resourceInfo.getName());
-                    Map<PartyShop, List<Transaction>> transactions = handlers.stream()
-                            .filter(handler -> handler.isHadle(ftpDir.getName()))
-                            .findFirst()
-                            .orElse(new SkipRegistryPayoutPayoutHandler())
-                            .handle(inputStream);
-                    payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
-                    if (processedPathNotExist(resourceInfoList)) {
-                        sftpClient.mkdir(resourceInfo.getParent() + "/" + PROCESSED_PATH);
-                    }
-                    sftpClient.rename(resourceInfo.getPath(),
-                            resourceInfo.getParent() + "/" + PROCESSED_PATH + "/" + resourceInfo.getName());
+                readFile(sftpClient, resourceInfo, ftpDir.getName(), payoutStorage);
+                if (isProcessedPathNotExist(resourceInfoList)) {
+                    sftpClient.mkdir(resourceInfo.getParent() + "/" + PROCESSED_PATH);
                 }
+                sftpClient.rename(resourceInfo.getPath(),
+                        resourceInfo.getParent() + "/" + PROCESSED_PATH + "/" + resourceInfo.getName());
             }
         }
         return payoutStorage;
     }
 
-    private boolean processedPathNotExist(final List<RemoteResourceInfo> list) {
+    private void readFile(SFTPClient sftpClient,
+                          RemoteResourceInfo resourceInfo,
+                          String providerPath,
+                          PayoutStorage payoutStorage) throws IOException {
+        try (RemoteFile remoteFile = sftpClient.open(resourceInfo.getPath());
+                InputStream inputStream = remoteFile.new RemoteFileInputStream(0)) {
+            log.info("File {} was received successfully", resourceInfo.getName());
+            Map<PartyShop, List<Transaction>> transactions = handlers.stream()
+                    .filter(handler -> handler.isHadle(providerPath))
+                    .findFirst()
+                    .orElse(new SkipRegistryPayoutPayoutHandler())
+                    .handle(inputStream);
+            payoutStorage.getPayouts().putAll(mapTransactionToPayout(transactions));
+        }
+    }
+
+    private boolean isProcessedPathNotExist(final List<RemoteResourceInfo> list) {
         return list.stream().noneMatch(o -> o.getName().equals(PROCESSED_PATH));
     }
 
